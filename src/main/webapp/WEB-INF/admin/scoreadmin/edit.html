@@ -1,0 +1,175 @@
+<style>
+	.form-control {
+	    padding: 0px;
+	}
+	.col-md-8 label {
+	    padding: 0 5px 0 0;
+	    line-height: 21px;
+	}
+	.col-md-8 label input {
+	    vertical-align: text-bottom;
+	    margin-bottom: 1px;
+	}
+	.answer-file{
+		font-family: 仿宋;
+	    font-size: 18px;
+	    color: #337ab7;
+	    font-weight: bold;
+	}
+	ul,li{ list-style:none;}
+	.fixed_item{
+		position:fixed;
+		right:46px;
+		top:12%;
+		width:45px;
+		z-index:9999;
+	}
+	.fixed_item li{
+		float:left;
+		width:30px;
+		height:30px;
+		background:#00b3ca;
+		border-radius:50%;
+		font-size:17px;
+		color:#fff;
+		line-height:32px;
+		text-align:center;
+		margin-bottom:10px;
+	}
+	.fixed_item li a{ color:#fff;}	
+	.fixed_item li:hover{ background:#0093a6;}
+</style>
+<div class="fixed_item">
+	<ul>
+		#(itemhtml)
+	</ul>
+</div>
+<link href="#(ctx)/common/css/redis.css" rel="stylesheet">
+<div id="page-title">
+	<h1 class="page-header text-overflow">#(pageTitleBread.pageTitle)</h1>
+</div>
+<ol class="breadcrumb">
+	<li><a href="javascript:void(0);">首页</a></li>
+	<li><a href="javascript:void(0);" onclick="doPjax('#(ctx)#(pageTitleBread.url)?topicid=#(topicid)')">#(pageTitleBread.pageTitle)</a></li>
+	<li class="active">#(pageTitleBread.nowBread)</li>
+</ol>
+<div class="col-md-offset-2 col-md-8" style="text-align: center;width: 100%;margin-left: 0px;">
+    <h1>#(topic?topic.name:'')</h1>
+</div>
+<div class="col-md-offset-2 col-md-8" style="width: 100%;margin-left: 0px;">
+   <div class="panel panel-default">
+   		<div class="panel-body" style="padding: 18px;">
+			<div class="col-md-4" style="color: red;">考核时间：#(topic?topic.begintime:'00:00') ~ #(topic?topic.endtime:'00:00')</div>
+			<div class="col-md-4">区县评分时间：#(topic?topic.qxbegintime:'00:00') ~ #(topic?topic.qxendtime:'00:00')</div>
+			<div class="col-md-4">专家评分时间：#(topic?topic.zjbegintime:'00:00') ~ #(topic?topic.zjendtime:'00:00')</div>
+		</div>
+   </div>
+</div>
+<div class="col-md-offset-2 col-md-8" style="width: 100%;margin-left: 0px;">
+    <form id="editForm" method="post" style="padding-bottom: 50px;">
+    	<input type="hidden" name="answer.topicid" value="#(topicid)">
+	    #(sjhtml)
+    </form>
+</div>
+<script type="text/javascript">
+	function IsPicture(fileName){
+	    //判断是否是图片 - strFilter必须是小写列举
+	    var strFilter=".jpeg|.gif|.jpg|.png|.bmp|.pic|"
+	    if(fileName.indexOf(".")>-1)
+	    {
+	        var p = fileName.lastIndexOf(".");
+	        var strPostfix=fileName.substring(p,fileName.length) + '|';        
+	        strPostfix = strPostfix.toLowerCase();
+	        if(strFilter.indexOf(strPostfix)>-1)
+	        {
+	            return true;
+	        }
+	    }        
+	    return false;            
+	}
+	//单文件上传文件
+    function uploadFile(value,val,answerid){
+    	$("#editForm").attr("enctype", "multipart/form-data");
+    	$("#editForm").attr("encoding","application/x-www-form-urlencoded");
+    	var files = document.getElementById('fileText'+val).files;  
+        var fileSize = 0;
+        if(files.length!=0){
+            fileSize = files[0].size;
+        }
+        if(fileSize >524288000){
+            alert("上传文件不能大于 500M ");
+            return false;
+        }
+
+        $('#loadingModal').modal({backdrop: 'static', keyboard: false});
+        $("#loadingModal").modal('show');
+       var form = $("#editForm");
+       var options  = {    
+           url:'#(ctx)/admin/resources/uploadFile',
+           type:'post',
+           //data:{id:value},
+           success:function(data){
+              var htmlToJson = JSON.parse(data);
+              if(htmlToJson.ifSuccess=="success"){
+                  $("#loadingModal").modal('hide');
+           		  $("#fileText"+val).val("");
+           		  var href = "#(ctx)/admin/resources/downFile?rid="+htmlToJson.id;
+           		  var html = $("#uploadFile"+val).html();
+           		  var ahref = "<a href='" + href + "'>";
+         		    if(IsPicture(htmlToJson.fileName)){
+         		  	  ahref = "<a href='" + href + "' target='_blank'>";
+                  }
+           		  if(html!=null && html!=""){
+           			  html = html +"<br><div id='file"+htmlToJson.id+"'>"+ahref+htmlToJson.fileName+"</a><span><a class='label label-default' href='javascript:void(0)' onclick=delFile('"+value+"','"+answerid+"','"+htmlToJson.id+"') style='margin-left: 20px;padding: .2em .6em 0.2em;'>删除</a></span></div>";
+               		  $("#uploadFile"+val).html(html);
+           		  }else{
+           		  	$("#uploadFile"+val).html("<div id='file"+htmlToJson.id+"'>"+ahref+htmlToJson.fileName+"</a><span><a class='label label-default' href='javascript:void(0)' onclick=delFile('"+value+"','"+answerid+"','"+htmlToJson.id+"') style='margin-left: 20px;padding: .2em .6em 0.2em;'>删除</a></span></div>");
+           		  }
+           		  
+           		  var idhtml = $("#fileRid"+value).val();
+           		  if(idhtml!=null && idhtml!=""){
+           			  idhtml = idhtml +","+htmlToJson.id;
+               		  $("#fileRid"+value).val(idhtml);
+           		  }else{
+           		  	$("#fileRid"+value).val(htmlToJson.id);
+           		  }
+           		  //上传成功后自动将rid插入指标中
+           		  var data = common_ajax.ajaxFunc("/admin/scoreadmin/saveUpload", {"answerid":answerid,"rid":htmlToJson.id}, "json", null);
+           		  if(!data.success){
+           		  	pointLion.alertMsg(data.message, "danger" , "small" , null);
+        			delFile(value,answerid,htmlToJson.id);
+        		  }
+              }else{
+            	  pointLion.alertMsg("请选择需要上传的文件!", "danger" , "small" , function(){
+            		  $("#loadingModal").modal('hide');
+            	  });
+              }
+           }                       
+       };    
+       form.ajaxSubmit(options);
+    }
+	
+	function delFile(qid,id,rid){
+		var data = common_ajax.ajaxFunc("/admin/answernoedit/delFile", {"id":id,"rid":rid}, "json", null);
+		if(data.success){
+			$("#file"+rid).remove();
+			$("#fileRid"+qid).val(data.message);
+		}else{
+			pointLion.alertMsg("删除附件出错" , "success" , "small" , null);
+		}
+	}
+	
+	var arr=[];
+	for (var i = 0; i < #(total); i++) {
+		arr[i]= new UE.ui.Editor({readonly:true,})
+		arr[i].render('content'+(i+1));
+	}
+	var evaluate = $("#evaluate").val();
+	if(evaluate=="优秀"){
+		$("#qxForm").find("input[name='score.evaluate']:eq(0)").attr("checked",true);
+	}else if(evaluate=="合格"){
+		$("#qxForm").find("input[name='score.evaluate']:eq(1)").attr("checked",true);
+	}else if(evaluate=="不合格"){
+		$("#qxForm").find("input[name='score.evaluate']:eq(2)").attr("checked",true);
+	}
+</script>

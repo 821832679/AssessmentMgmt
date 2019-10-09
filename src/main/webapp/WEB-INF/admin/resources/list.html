@@ -1,0 +1,235 @@
+				#include("/common/include/pageTitleBread.html")
+			
+			
+			 
+               <div id="page-content">
+			        <div class="col-sm-12 eq-box-sm">
+			        	<div class="panel lion-fullHeight">
+						    <div class="panel-body">
+						      
+						      <div >
+						     <tr> 	
+						        <td>			     
+					                        <!-- 栏目分类:<select name="" id="" onchange="onchanged()" >
+				                    <option selected="selected">--请选择--</option>
+				                 	
+			                        </select>
+			                      </td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
+			                    <td>			     
+					            
+								<input placeholder="请选择日期" id="date" name ="date" size="16" type="text" value="" class="form_datetime" onchange="onchanged()" ">
+									
+			                      </td>	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	                      			                      
+			                    <td>	     
+					                              格式:<select name="suffix"   id="suffix"  onchange="onchanged()";>
+							       <option selected="selected" value="">--请选择--</option>
+							      #for(suf : suffixs)
+							      <option  value="#(suf.suffix)">#(suf.suffix)</option>
+							      #end
+						           </select>
+						          </td>
+						        <!-- <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						          地区:<select name="area"  id="area"  onchange="onchanged()";>
+							      <option selected="selected" value="">--请选择--</option>
+							      #for(org:orgs)
+							      <option  value="#(org.id)">#(org.name)</option>
+							      #end
+						          </select> 
+						         </td> -->
+						       <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						         上传人员:<select name="uploader"  id="uploader" onchange="onchanged()";>
+							      <option selected="selected" value="">--请选择--</option>
+							      #for(user:users)
+							      <option  value="#(user.id)">#(user.name)</option>
+							      #end
+						          </select>
+					            </td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;		         		     
+					           <td>    
+					                  <input type="text" name="keyWord" id="keyWord" value=""/><span> <input type="button" value="搜索" onclick="onclicked()"  /> </span>              
+			                    </td>
+			                 </tr>
+			                 
+			                 <br>
+			                 <input type="hidden" value="#(code)" name ="code" id="code" />
+			                 <br>
+			                <div>
+				                <i class="demo-pli-add"></i>资源导入 
+								  <form id="uploadFile" enctype="multipart/form-data">
+							        <input type="file" class="btn btn-info data-toolbar" id="fileText" name="fileText" placeholder="请选择文件" style="display: inline;"/>
+							        <a class="btn btn-info data-toolbar" href="javascript:void(0)" onclick="uploadFile()" >上传</a>
+							    </form>  
+			                 </div>						
+						     </div>	 					       
+						    <table id="pageTable" class="demo-add-niftycheck" data-toolbar="#del,#add"
+						               data-search="true"
+						               data-show-refresh="true"
+						               data-show-toggle="true"
+						               data-show-columns="true"
+						               data-sort-name="id"
+						               data-page-list="[5, 10, 20]"
+						               data-page-size="5"
+						               data-pagination="true" data-show-pagination-switch="true" data-toggle="table"></table>
+						    </div>
+						</div>
+			        </div>
+                </div>          
+<script>
+    var suffix = '';
+    var area = '';
+    var uploader = '';
+    var date = '';
+    var keyWord = '';
+    var code = $("#code").val();
+   
+   
+	var col = [{
+	       field: 'rname',
+	       title: '文件名称',
+	       align: 'center'
+	   },{
+	       field: 'suffix',
+	       title: '文件后缀',
+	       align: 'center'
+	   },{
+	       field: 'username',
+	       title: '上传人员',
+	       align: 'center'
+	   },{
+	       field: 'orgname',
+	       title: '上传机构',
+	       align: 'center'
+	   },{
+	       field: 'createTime',
+	       title: '上传时间',
+	       align: 'center'
+	   },{
+	       field: 'rid',
+	       title: '操作',
+	       align: 'center',
+	       width:'440',
+	       formatter:function(value,row,index){
+	           //通过formatter可以自定义列显示的内容
+	           //value：当前field的值，即id
+	           //row：当前行的数据   	
+	            var a = '<a class="label label-table label-info" href="#(ctx)/admin/resources/downFile?rid='+value+'" >下载</a>&nbsp;';
+	           return a;
+	       } 
+	   }];
+	var opt = {
+		      //请求方法
+			   method: 'get',
+			    //是否显示行间隔色
+			   striped: true,
+			   //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）     
+			   cache: false,  
+			   //data-toolbar: "#demo-delete-row",
+			   //是否显示分页（*）  
+			   pagination: true,   
+			    //是否启用排序  
+			   sortable: false,    
+			    //排序方式 
+			   sortOrder: "asc",    
+			   //初始化加载第一页，默认第一页
+			   //我设置了这一项，但是貌似没起作用，而且我这默认是0,- -
+			   //pageNumber:1,   
+			   //每页的记录行数（*）   
+			   pageSize: 10,  
+			   //可供选择的每页的行数（*）    
+			   pageList: [10, 25, 50, 100],
+			   //这个接口需要处理bootstrap table传递的固定参数,并返回特定格式的json数据  
+			   url: ctx+"/admin/resources/listData",
+			   //默认值为 'limit',传给服务端的参数为：limit, offset, search, sort, order Else
+			   //queryParamsType:'',   
+			   ////查询参数,每次调用是会带上这个参数，可自定义                         
+			   queryParams : function(params) {
+			       return {
+			             pageNumber: ((params.offset+1)/params.limit)+1,
+			             pageSize: params.limit,
+			             suffix:suffix,
+			             area:area,
+			             uploader:uploader,
+			             date:date,
+			             keyWord:keyWord,
+			             code:code
+			           };
+			   },
+			   //分页方式：client客户端分页，server服务端分页（*）
+			   sidePagination: "server",
+			   //是否显示搜索
+			   search: false,  
+			   //Enable the strict search.    
+			   strictSearch: true,
+			   //Indicate which field is an identity field.
+			   idField : "id",
+			   columns: col,
+			   pagination:true
+			}; 
+		
+	//表格
+	function initTable(){
+		$('#pageTable').bootstrapTable(opt);
+		$('#pageTable').bootstrapTable('hideColumn', 'id');
+		$('#pageTable').bootstrapTable('hideColumn', 'proc_ins_id');
+		$('#pageTable').bootstrapTable('hideColumn', 'defid');
+
+	}
+	function refreshTable(){
+		$("#pageTable").bootstrapTable('refresh', opt);
+		$('#pageTable').bootstrapTable('hideColumn', 'id');
+		$('#pageTable').bootstrapTable('hideColumn', 'proc_ins_id');
+		$('#pageTable').bootstrapTable('hideColumn', 'defid');
+	}
+	
+	function onchanged(){
+		 suffix = $("#suffix").val();
+	     area = $("#area").val();
+	     uploader = $("#uploader").val();
+	     date = $("#date").val();
+	     refreshTable();
+	     //alert(suffix+" "+area+" "+uploader+" "+date);
+	}
+	function onclicked(){
+		keyWord = $("#keyWord").val();
+		refreshTable();
+		//alert(keyWord);
+	}
+
+	$(".form_datetime").datetimepicker({
+		format: 'yyyy-mm-dd',//显示格式
+		todayHighlight: 1,//今天高亮
+		minView: "month",//设置只显示到月份
+		startView:2,
+		forceParse: 0,
+		showMeridian: 1,
+		language:"zh-CN", //语言设置
+		autoclose: 1//选择后自动关闭
+	});
+	
+	$(document).ready(function(){
+		initFullHeight();//初始化高度
+		initTable();//初始化表格	
+	});
+</script>
+<script type="text/javascript"> 
+    //单文件上传文件
+    function uploadFile(){
+       var form = $("#uploadFile");  
+       var options  = {    
+           url:'#(ctx)/admin/resources/uploadFile',    
+           type:'post',
+           //data:{},    
+           success:function(data){
+              var htmlToJson = JSON.parse(data);
+              if(htmlToJson.ifSuccess=="success"){
+                     //alert("文件上传成功！");
+            	  pointLion.alertMsg("上传成功!" , "success" , "small" , function(){
+  					doPjax(ctx+'/admin/resources/getListPage');//跳转到列表页
+  				});
+              }else{
+            	  pointLion.alertMsg("请选择需要上传的文件!");
+              }
+           }                       
+       };    
+       form.ajaxSubmit(options);
+    }
+</script>

@@ -1,0 +1,121 @@
+ #include("/common/include/pageTitleBread.html")
+<div id="page-content">
+	<div class="col-lg-12">
+		<div class="panel">
+			<div class="panel-heading">
+				<h3 class="panel-title">编辑栏目单元信息</h3>
+			</div>
+			<div  class="panel-body form-horizontal form-padding">
+				#for(f:formList)
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">#(f.label)</label>
+					<div class="col-md-2">
+					#if(values)
+						#for(v:values)
+							#if(v.name==f.fieldName)
+							<input type="text" name="#(f.fieldName)" class="form-control" value="#(v.value)" readonly="readonly">
+							#end
+						#end
+					#else
+						<input type="text" name="#(f.fieldName)" class="form-control" value="">
+					#end
+						<small class="help-block">请输入#(f.label)</small>
+					</div>
+				</div>
+				#end
+
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">单位性质</label>
+					<div class="col-md-2">
+						<select name="tPublicService.type" class="form-control";>
+							<option value="0">图书馆</option>
+							<option value="1">文化站</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">上传内容</label>
+					<div class="col-md-2">
+						<input type="text" name="tPublicService.otherContext" class="form-control" value="#(s?s.otherContext:'')" readonly="readonly"> 
+					    <input type="hidden" id="tid" name="tPublicService.id" class="form-control" value="#(s?s.id:'')"> 
+					    <small class="help-block">请输入上传内容</small>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">上传者</label>
+					<div class="col-md-2">
+						<input type="text" name="tPublicService.uploader"
+							class="form-control" value="#(s?s.uploader:'')" readonly="readonly"> <small
+							class="help-block">请输入上传者</small>
+					</div>
+				</div>
+				<div class="panel-footer">
+					<div class="row">
+						<div class="col-sm-9 col-sm-offset-3">
+							<button class="btn btn-warning" type="reset" id="rejected" name="rejected" value="rejected">驳回</button>
+							<button class="btn btn-mint"  id="pass" name="pass" value="pass" >通过</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	
+			 
+			 
+		$(document).ready(function() {
+			
+			 $("#pass").click(function(){
+				 var pass= $("#pass").val();
+				 var id = $("#tid").val();
+				 $.post(
+						ctx+"/admin/im/audit",
+						{
+							pass:pass,
+							tid:id
+						},
+						function(data){
+							pointLion.alertMsg("通过!" , "success" , "small" , function(){
+								doPjax(ctx+'/admin/im/getImAuditList');//跳转到列表页
+							});
+						},
+						"json"
+				 )
+			}); 
+			
+			$("#rejected").click(function(){
+				var rejected = $("#rejected").val();
+				var id = $("#tid").val();
+				$.post(
+						ctx+"/admin/im/audit",
+						{
+							rejected:rejected,
+							tid:id
+						},
+						function(data){
+							pointLion.alertMsg("驳回!" , "success" , "small" , function(){
+								doPjax(ctx+'/admin/im/getImAuditList');//跳转到列表页
+							});
+						},
+						"json"
+				)
+			});
+			
+			 /* function rejected(){
+				 var rejected= $("#rejected").val();
+				 $.post(
+						 
+						ctx+"/admin/im/audit",
+						{rejected:rejected},
+						function(data){
+							
+						},
+						"json"
+				 )
+				} */ 
+		});
+	</script>

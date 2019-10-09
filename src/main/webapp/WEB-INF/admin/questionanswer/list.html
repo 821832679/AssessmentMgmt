@@ -1,0 +1,284 @@
+<style>
+	.form-control {
+	    padding: 0px;
+	}
+	.answer-file{
+		font-family: 仿宋;
+	    font-size: 18px;
+	    color: #337ab7;
+	    font-weight: bold;
+	}
+	ul,li{ list-style:none;}
+	.fixed_item{
+		position:fixed;
+		right:46px;
+		top:12%;
+		width:45px;
+		z-index:9999;
+	}
+	.fixed_item li{
+		float:left;
+		width:30px;
+		height:30px;
+		background:#00b3ca;
+		border-radius:50%;
+		font-size:17px;
+		color:#fff;
+		line-height:32px;
+		text-align:center;
+		margin-bottom:10px;
+	}
+	.fixed_item li a{ color:#fff;}	
+	.fixed_item li:hover{ background:#0093a6;}
+</style>
+<div class="fixed_item">
+	<ul>
+		#(itemhtml)
+	</ul>
+</div>
+<div id="page-title">
+	<h1 class="page-header text-overflow">#(pageTitleBread.pageTitle)</h1>
+</div>
+<ol class="breadcrumb">
+	<li><a href="javascript:void(0);">首页</a></li>
+	<li><a href="javascript:void(0);" onclick="doPjax('#(ctx)#(pageTitleBread.url)?topicid=#(topicid)')">#(pageTitleBread.pageTitle)</a></li>
+	<li class="active">#(pageTitleBread.nowBread)</li>
+</ol>
+<div class="col-md-offset-2 col-md-8" style="text-align: center;width: 100%;margin-left: 0px;">
+    <h1>#(topic?topic.name:'')</h1>
+</div>
+<div class="col-md-offset-2 col-md-8" style="width: 100%; margin-left: 0px;">
+	<div class="panel panel-default">
+		<div class="panel-body" style="padding: 18px;">
+			<div class="col-md-4">起止时间：#(topic?topic.begintime:'00:00') ~ #(topic?topic.endtime:'00:00')</div>
+			#if(yqendtime!=null )
+			<div class="col-md-4" style="color: red;">
+				考核延期截止日期：#(yqendtime) 
+			</div>
+			#else  #end
+		</div>
+	</div>
+</div>
+<div class="col-md-offset-2 col-md-8" style="width: 100%;margin-left: 0px;">
+	<form id="editForm" method="post">
+       	<input type="hidden" name="answer.topicid" value="#(topicid)">
+       	#(sjhtml)
+   		<div class="col-md-offset-5 col-md-2" style="padding-bottom: 80px;">
+		    <button class="btn btn-danger" type="reset">重置指标</button>&nbsp;&nbsp;
+			<button class="btn btn-primary" type="button" onclick="check();">提交指标</button>
+		</div>
+    </form>
+</div>
+<div class="modal fade" id="loadingModal">
+	<div style="width: 200px;height:20px; z-index: 20000; position: absolute; text-align: center; left: 50%; top: 20%;margin-left:-100px;margin-top:-10px">
+		<h5 style="color: #e81f08;margin-bottom: 2px;">文件上传中...</h5>
+		<div class="progress progress-striped active" style="margin-bottom: 0;">
+			<div class="progress-bar" style="width: 100%;"></div>
+		</div>
+	</div>
+</div>
+<script>
+	function save(){
+		var data = common_ajax.ajaxFunc("/admin/answer/save", $('#editForm').serialize(), "json", null);
+		if(data.success){
+			pointLion.alertMsg("指标列表提交成功!" , "success" , "small" , function(){
+				doPjax(ctx+'/admin/question/getListPage');//跳转到列表页
+			});
+		}else{
+			pointLion.alertMsg(data.message , "danger" , "small" , null);
+		}
+	}
+	function check(){
+		var isTrue = true;
+		if(!#(topicTimeStat)){
+			pointLion.alertMsg("考核未开始或已结束" , "warning" , "small" , null);
+			return false;
+		}
+		if(#(total)<=0){
+			pointLion.alertMsg("当前指标列表考核指标内容为空，请先添加考核指标!");
+			return false;
+		}
+		for(var i=0;i<#(total);i++){
+			var content = arr[i].getContent();
+			if(content!=null && content.trim()!=""){
+				isTrue = true;
+			}
+			/* if(content==null || content.trim()==""){
+				$('#valid-'+(i+1)).show();
+				isTrue = false;
+			}else{
+				$('#valid-'+(i+1)).hide();
+			}
+			if(typeof(content)=="undefined"){
+				isTrue = false;
+				break;
+			} */
+		} 
+		if(isTrue){
+			$("#editForm").attr("enctype", "");
+	    	$("#editForm").attr("encoding","");
+			save();
+			/* pointLion.confimMsg("您确认提交吗？",null,function(){
+				save();
+			}); */
+		}else{
+			$("#editForm").attr("enctype", "");
+	    	$("#editForm").attr("encoding","");
+			pointLion.alertMsg("至少回答一道的题目" , "warning" , "small" , null);
+			return false;
+		}
+	}
+</script>
+<script type="text/javascript">
+	var arr=[];
+	for (var i = 0; i < #(total); i++) {
+		if(#(topicTimeStat)){
+			arr[i]= UE.getEditor('content'+(i+1), {});
+		}else{
+			arr[i]= new UE.ui.Editor({readonly:true,})
+			arr[i].render('content'+(i+1));
+		}
+	}
+</script>
+<script type="text/javascript"> 
+	function IsPicture(fileName){
+	    //判断是否是图片 - strFilter必须是小写列举
+	    var strFilter=".jpeg|.gif|.jpg|.png|.bmp|.pic|"
+	    if(fileName.indexOf(".")>-1)
+	    {
+	        var p = fileName.lastIndexOf(".");
+	        var strPostfix=fileName.substring(p,fileName.length) + '|';        
+	        strPostfix = strPostfix.toLowerCase();
+	        if(strFilter.indexOf(strPostfix)>-1)
+	        {
+	            return true;
+	        }
+	    }        
+	    return false;            
+	}
+    //单文件上传文件
+    function uploadFile(value,val,id){
+    	$("#editForm").attr("enctype", "multipart/form-data");
+    	$("#editForm").attr("encoding","application/x-www-form-urlencoded");
+    	var files = document.getElementById('fileText'+val).files;  
+        var fileSize = 0;
+        if(files.length!=0){
+            fileSize = files[0].size;
+        }
+        if(fileSize >524288000){
+            alert("上传文件不能大于 500M ");
+            return false;
+        }
+
+        $('#loadingModal').modal({backdrop: 'static', keyboard: false});
+        $("#loadingModal").modal('show');
+       var form = $("#editForm");
+       var options  = {    
+           url:'#(ctx)/admin/resources/uploadFile',
+           type:'post',
+           //data:{id:value},
+           success:function(data){
+              var htmlToJson = JSON.parse(data);
+              if(htmlToJson.ifSuccess=="success"){
+                  $("#loadingModal").modal('hide');
+           		  $("#fileText"+val).val("");
+           		  var href = "#(ctx)/admin/resources/downFile?rid="+htmlToJson.id;
+           		  var html = $("#uploadFile"+val).html();
+	           	  var ahref = "<a href='" + href + "'>";
+	         	  if(IsPicture(htmlToJson.fileName)){
+	         	  	ahref = "<a href='" + href + "' target='_blank'>";
+	              }
+           		  if(html!=null && html!=""){
+           			  html = html +"<br><div id='file"+htmlToJson.id+"'>"+ahref+htmlToJson.fileName+"</a><span><a class='label label-default' href='javascript:void(0)' onclick=delFile('"+value+"','"+id+"','"+htmlToJson.id+"') style='margin-left: 20px;padding: .2em .6em 0.2em;'>删除</a></span></div>";
+               		  $("#uploadFile"+val).html(html);
+           		  }else{
+           		  	$("#uploadFile"+val).html("<div id='file"+htmlToJson.id+"'>"+ahref+htmlToJson.fileName+"</a><span><a class='label label-default' href='javascript:void(0)' onclick=delFile('"+value+"','"+id+"','"+htmlToJson.id+"') style='margin-left: 20px;padding: .2em .6em 0.2em;'>删除</a></span></div>");
+           		  }
+           		  
+           		  var idhtml = $("#fileRid"+value).val();
+           		  if(idhtml!=null && idhtml!=""){
+           			  idhtml = idhtml +","+htmlToJson.id;
+               		  $("#fileRid"+value).val(idhtml);
+           		  }else{
+           		  	$("#fileRid"+value).val(htmlToJson.id);
+           		  }
+            	//pointLion.alertMsg("上传成功!" , "success" , "small" , function(){});
+              }else{
+            	  pointLion.alertMsg("请选择需要上传的文件!", "danger" , "small" , function(){
+            		  $("#loadingModal").modal('hide');
+            	  });
+              }
+           }                       
+       };    
+       form.ajaxSubmit(options);
+    }
+    
+    function delFile(qid,id,rid){
+		var data = common_ajax.ajaxFunc("/admin/answernoedit/delFile", {"id":qid,"rid":rid}, "json", null);
+		if(data.success){
+			$("#file"+rid).remove();
+			$("#fileRid"+qid).val(data.message);
+		}else{
+			pointLion.alertMsg("删除附件出错" , "success" , "small" , null);
+		}
+	}
+    
+  	//单文件上传任务文件
+    function uploadAnswerFile(value,val,id){
+    	$("#editForm").attr("enctype", "multipart/form-data");
+    	$("#editForm").attr("encoding","application/x-www-form-urlencoded");
+    	var files = document.getElementById('fileAnswerText'+val).files;  
+    	var filename = document.getElementById('fileAnswerText'+val).value;
+        var fileSize = 0;
+        if(files.length!=0){
+            fileSize = files[0].size;
+        }
+        if(filename!=null && filename!=""){
+          	//取出上传文件的扩展名
+            var index = filename.lastIndexOf(".");
+            var ext = filename.substr(index+1);
+            if(ext != "xls"){
+            	pointLion.alertMsg("请使用任务模板附件上传" , "danger" , "small" , null);
+            	return false;
+            }
+        }
+        if(fileSize >524288000){
+            alert("上传文件不能大于 500M ");
+            return false;
+        }
+
+        $('#loadingModal').modal({backdrop: 'static', keyboard: false});
+        $("#loadingModal").modal('show');
+       var form = $("#editForm");
+       var options  = {    
+           url:'#(ctx)/admin/resources/uploadFile',
+           type:'post',
+           success:function(data){
+              var htmlToJson = JSON.parse(data);
+              if(htmlToJson.ifSuccess=="success"){
+              	  $("#loadingModal").modal('hide');
+           		  $("#fileAnswerText"+val).val("");
+           		  var href = "#(ctx)/admin/resources/downFile?rid="+htmlToJson.id;
+           		  $("#uploadAnswerFile"+val).html("<div id='answerfile"+htmlToJson.id+"'><a class='answer-file' href='"+href+"'>"+htmlToJson.fileName+"</a><span><a class='label label-default' href='javascript:void(0)' onclick=delAnswerFile('"+value+"','"+id+"','"+htmlToJson.id+"') style='margin-left: 20px;padding: .2em .6em 0.2em;'>删除</a></span></div>");
+           		  $("#fileFid"+value).val(htmlToJson.id);
+            	  //pointLion.alertMsg("上传成功!" , "success" , "small" , function(){});
+              }else{
+            	  pointLion.alertMsg("请选择需要上传的文件!", "danger" , "small" , function(){
+            		  $("#loadingModal").modal('hide');
+            	  });
+              }
+           }                       
+       };    
+       form.ajaxSubmit(options);
+    }
+    
+    function delAnswerFile(qid,id,fid){
+		var data = common_ajax.ajaxFunc("/admin/answer/delFile", {"id":qid,"fid":fid}, "json", null);
+		if(data.success){
+			$("#answerfile"+fid).remove();
+			$("#fileFid"+qid).val(data.message);
+		}else{
+			pointLion.alertMsg("删除附件出错" , "success" , "small" , null);
+		}
+	}
+</script>

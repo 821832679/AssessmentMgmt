@@ -1,0 +1,257 @@
+<div id="page-title">
+	<h1 class="page-header text-overflow">#(pageTitleBread.pageTitle)</h1>
+</div>
+<ol class="breadcrumb">
+	<li><a href="javascript:void(0);">首页</a></li>
+	<li><a href="javascript:void(0);" onclick="doPjax('#(ctx)#(pageTitleBread.url)?topicid=#(topicid)')">#(pageTitleBread.pageTitle)</a></li>
+	<li class="active">#(pageTitleBread.nowBread)</li>
+	<li>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="doPjax('#(ctx)/admin/topic/getListPage')"><font style="color: red;">返回指标列表列表</font></a></li>
+</ol>
+<div id="page-content">
+		<div class="col-lg-12">
+	        <div class="panel">
+	            <div class="panel-heading">
+	                <h3 class="panel-title">编辑考核指标信息</h3>
+	            </div>
+	            <form id="editForm" class="panel-body form-horizontal form-padding">
+	            	<input type="hidden"  name="question.id" class="form-control" value="#(t?t.id:'')">
+	            	<input type="hidden"  name="fileConfig.id" class="form-control" value="#(f?f.id:'')">
+	            	<input type="hidden" name="topicid" class="form-control"  value="#(topicid?topicid:'')">
+	            	<div class="form-group">
+	                    <label class="col-md-3 control-label" for="demo-text-input">考核指标类型</label>
+	                    <div class="col-md-9">
+	                        <select name="question.typeid" class="form-control" style="height:32px;width:300px" ;>
+							</select>
+	                    </div>
+	                </div>
+	                
+	                <div class="form-group">
+	                    <label class="col-md-3 control-label" for="demo-text-input">考核描述</label>
+	                    <div class="col-md-9">
+	                        <textarea  class="form-control" style="width:100%;height:300px;" name="question.describle" id="newDescrible">#(t?t.describle:'')</textarea>
+	                    </div>
+	                </div>
+	                <div class="form-group">
+	                    <label class="col-md-3 control-label" for="demo-text-input">显示顺序</label>
+	                    <div class="col-md-4">
+	                        <input type="text" name="question.sortvalue" class="form-control" value="#(t?t.sortvalue:0)">
+	                    </div>
+	                </div>
+	                <div class="form-group">
+	                    <label class="col-md-3 control-label" for="demo-text-input">状态</label>
+	                    <div class="col-md-9">
+	                        <select name="question.status" class="form-control" style="height:32px;width:300px" ;>
+								<option value="1" #if(t&&t.status == "1" ) selected="selected" #else  #end >启用</option>
+								<option value="0" #if(t&&t.status == "0" ) selected="selected" #else  #end >禁用</option>
+							</select>
+	                    </div>
+	                </div>
+	                
+	                <div class="form-group">
+	                    <label class="col-md-3 control-label" for="demo-text-input">任务模板excel</label>
+	                    <div class="col-md-9">
+	                    	<p>
+	                    		<p id="uploadFile"></p>
+								<input type="hidden" id="fid" name="question.fid" value="#(t?t.fid:'')">
+								<input type="file" accept=".xls" class="btn btn-info data-toolbar" id="fileText" name="fileText" placeholder="请选择文件" style="display: inline;"/>
+								<a class="btn btn-info data-toolbar" href="javascript:void(0)" onclick="uploadFile()">上传</a>
+							</p>
+	                    </div>
+	                </div>
+	                <div class="form-group">
+	                    <label class="col-md-3 control-label" for="demo-text-input">是否统计模板数据</label>
+	                    <div class="col-md-9">
+	                    	<select id="isstatis" name="question.isstatis" class="form-control" style="height:32px;width:300px;">
+								<option value="1" #if(t&&t.isstatis == 1 ) selected="selected" #else  #end >是</option>
+								<option value="0" #if(t&&t.isstatis == 0 ) selected="selected" #else  #end >否</option>
+							</select>
+	                    </div>
+	                </div>
+	                
+	                <div id="statis">
+	                	<div class="form-group">
+	                		<label class="col-md-3 control-label" for="demo-text-input">excel统计方向</label>
+	                		<div class="col-md-9">
+		                    	<select id="direction" name="fileConfig.direction" class="form-control" style="height:32px;width:300px" ;>
+		                    		<option value="1" #if(f&&f.direction == 1 ) selected="selected" #else  #end >横向</option>
+									<option value="0" #if(f&&f.direction == 0 ) selected="selected" #else  #end >纵向</option>
+								</select>
+		                    </div>
+	                	</div>
+	                	
+	                	<div class="form-group">
+	                		<label class="col-md-3 control-label" for="demo-text-input">统计起始行/列数</label>
+	                		<div class="col-md-4">
+	                			<input type="number" class="form-control" id="begin" name="fileConfig.begin" value="#(f?f.begin:0)">
+		                    </div>
+	                	</div>
+	                	
+	                	<div class="form-group">
+	                		<label class="col-md-3 control-label" for="demo-text-input">统计行/列数</label>
+	                		<div class="col-md-4">
+	                			<input type="number" class="form-control" id="rownum" name="fileConfig.rownum" value="#(f?f.rownum:'')" placeholder="0表示统计全部">
+		                    </div>
+	                	</div>
+	                	
+	                	<div class="form-group">
+	                		<label class="col-md-3 control-label" for="demo-text-input">不统计行/列数</label>
+	                		<div class="col-md-4">
+	                			<input type="number" class="form-control" id="end" name="fileConfig.end" value="#(f?f.end:'')" placeholder="备注不统计行/列数">
+		                    </div>
+	                	</div>
+	                </div>
+	                
+	                <div class="panel-footer">
+	                    <div class="row">
+	                        <div class="col-sm-9 col-sm-offset-3">
+	                            <button class="btn btn-warning" type="reset">重置</button>
+	                            <button class="btn btn-mint" type="submit" >保存</button>
+	                        </div>
+	                    </div>
+	                </div>
+	            </form>
+	        </div>
+	    </div>
+</div>
+<div class="modal fade" id="loadingModal">
+	<div style="width: 200px;height:20px; z-index: 20000; position: absolute; text-align: center; left: 50%; top: 20%;margin-left:-100px;margin-top:-10px">
+		<h5 style="color: #e81f08;margin-bottom: 2px;">文件上传中...</h5>
+		<div class="progress progress-striped active" style="margin-bottom: 0;">
+			<div class="progress-bar" style="width: 100%;"></div>
+		</div>
+	</div>
+</div>
+<script>
+	UE.getEditor('newDescrible', {});
+
+	function save(){
+		if($("#fid").val()==""){
+			pointLion.alertMsg("请上传任务模板" , "danger" , "small" , null);
+			return false;
+		}
+		var data = common_ajax.ajaxFunc("/admin/question/save", $('#editForm').serialize(), "json", null);
+		if(data.success){
+			pointLion.alertMsg("保存成功!" , "success" , "small" , function(){
+				doPjax(ctx+'/admin/question/getListPage?topicid=#(topicid)');//跳转到列表页
+			});
+		}else{
+			pointLion.alertMsg(data.message , "danger" , "small" , null);
+		}
+	}
+	//查询考核指标类型
+	function getType(){
+		var data = common_ajax.ajaxFunc("/admin/topictype/listStatusData", "StatusValue=1", "json", null);
+		if(data.success){
+			var rows = data.rows;
+			for(var i in rows){
+				$("#editForm").find("select[name='question.typeid']").append("<option value='"+rows[i].id+"'>"+rows[i].name+"</option>");
+			}
+		}
+	}
+	
+	$("#isstatis").change(function(){
+		if($(this).val() == 1){
+			$("#statis").show();
+		}else{
+			$("#statis").hide();
+		}
+	});
+	
+	$(document).ready(function() {
+		$("#statis").hide();
+		if($("#isstatis").val() == 1){
+			$("#statis").show();
+		}else{
+			$("#statis").hide();
+		}
+		getType();
+		$('#editForm').bootstrapValidator({
+            fields: {
+                "question.describle": {
+                    validators: {
+                    	notEmpty: {
+                            message: '*考核指标描述不能为空'
+                        },
+                    	stringLength: {
+                            max: 2000,
+                            message: '考核指标描述信息长度必须小于2000'
+                        }
+                    }
+                },
+                "question.score": {
+                    validators: {
+                        digits : {
+                            message : '字段必须是正整数'
+                        },
+                        greaterThan: {
+                            value : 1,
+                            message : '最小输入1'
+                        }/*,
+	                        lessThan: {
+	                        value : 100,
+	                        message : '最大输入100'
+	                    }*/
+                    }
+                }
+            }
+        }).on("success.form.bv", function (e) {
+            save();
+            return false;//阻止表单跳转
+        });
+		
+		//判断是否存在附件
+		if($("#fid").val()!=""){
+			var href = "#(ctx)/admin/resources/downFile?rid=" + $("#fid").val();
+			$("#uploadFile").html("<div id='questionfile'><a href='"+href+"'>#(resource?resource.rname:'')</a></div>");
+		}
+	});
+</script>
+<script type="text/javascript"> 
+    //单文件上传文件
+    function uploadFile(){
+    	$("#editForm").attr("enctype", "multipart/form-data");
+    	$("#editForm").attr("encoding","application/x-www-form-urlencoded");
+    	var files = document.getElementById('fileText').files;  
+    	var filename = document.getElementById('fileText').value;
+        var fileSize = 0;
+        if(files.length!=0){
+            fileSize = files[0].size;
+        }
+        if(filename!=null && filename!=""){
+          	//取出上传文件的扩展名
+            var index = filename.lastIndexOf(".");
+            var ext = filename.substr(index+1);
+            if(ext != "xls"){
+            	pointLion.alertMsg("请上传.xls文件模板" , "danger" , "small" , null);
+            	return false;
+            }
+        }
+        if(fileSize >524288000){
+            alert("上传文件不能大于 500M ");
+            return false;
+        }
+        $('#loadingModal').modal({backdrop: 'static', keyboard: false});
+        $("#loadingModal").modal('show');
+       var form = $("#editForm");
+       var options  = {    
+           url:'#(ctx)/admin/resources/uploadFile',
+           type:'post',
+           success:function(data){
+              var htmlToJson = JSON.parse(data);
+              if(htmlToJson.ifSuccess=="success"){
+                  $("#loadingModal").modal('hide');
+           		  $("#fileText").val("");
+           		  var href = "#(ctx)/admin/resources/downFile?rid="+htmlToJson.id;
+           		  $("#uploadFile").html("<div id='file"+htmlToJson.id+"'><a href='"+href+"'>"+htmlToJson.fileName+"</a></div>");
+           		  $("#fid").val(htmlToJson.id);
+            	//pointLion.alertMsg("上传成功!" , "success" , "small" , function(){});
+              }else{
+            	  pointLion.alertMsg("请选择需要上传的文件!", "danger" , "small" , function(){
+            		  $("#loadingModal").modal('hide');
+            	  });
+              }
+           }                       
+       };    
+       form.ajaxSubmit(options);
+    }
+</script>

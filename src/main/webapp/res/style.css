@@ -1,0 +1,18 @@
+input.formInput{width:400px;}
+input.formInputSmall{width:200px;}
+input.formInputMedium{width:400px;}
+input.formInputHuge{width:600px;}
+input.numberInput{text-align:right;}
+
+select.formInput{width:406px;}
+select.formInputSmall{width:206px;}
+select.formInputMedium{width:406px;}
+select.formInputHuge{width:606px;}
+
+textarea.formInput{width:406px;}
+textarea.formInputSmall{width:206px;}
+textarea.formInputMedium{width:406px;}
+textarea.formInputHuge{width:606px;}
+
+a.help{display:inline-block;width:16px; height:22px; background:url(images/help.png) 0 2px no-repeat;opacity:0.8;}
+a.help:hover{opacity:1.0}

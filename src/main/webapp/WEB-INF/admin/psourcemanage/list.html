@@ -1,0 +1,241 @@
+				#include("/common/include/pageTitleBread.html")
+               <div id="page-content">
+			        <div class="col-sm-12 eq-box-sm">
+			        	<div class="panel lion-fullHeight">
+						    <div class="panel-body">
+						     <a id="add" class="btn btn-info data-toolbar" onclick="doPjax('#(ctx)/admin/psourcemanage/getTmEditPage')" href="javascript:void(0);"><i class="demo-pli-add"></i>新增</a>					
+						       <a id="add" class="btn btn-info data-toolbar" href="http://210.43.241.80:8080/YiDaoMgmt/admin/into/downfile"><i class="demo-pli-add"></i>Excel导出</a>
+				
+						    	<i class="demo-pli-add"></i>Excel导入
+						   <form 	action="http://210.43.241.80:8080/YiDaoMgmt/admin/into/uploadFile" enctype="multipart/form-data" method="post">
+    						    <input  class="btn btn-info data-toolbar" type="file" name="file"/>
+    							<input  class="btn btn-info data-toolbar" type="submit"/>
+								</form>
+						      
+						      
+						      <div >
+						     <tr> 	
+						        <!-- <td>			     
+					                                 学历：<select name="Educationaltype" id="Educationaltype" onchange="onchanged()" >
+				                    <option selected="selected">--请选择--</option>
+				                 	#for(tpq : tpqList)
+ 						 				<option value="#(tpq.TPQ_Code)">#(tpq.Value)</option>
+									#end
+			                        </select>
+			                      </td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			                    <td> -->			     
+					                                专业：<select name="Professionaltype" id="Professionaltype"  onchange="onchanged()" >
+				                    <option selected="selected">--请选择--</option>
+				                    #for(tpc : tpcList)
+ 						 				<option value="#(tpc.TPC_Code)">#(tpc.Value)</option>
+									#end   
+									</select>
+			                      </td>	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	                      			                      
+			                    <td>	     
+					                              地址 <select name="first"   id="first" change="changeFSelect()" onchange="onchanged()";>
+							       <option selected="selected" value="value">请选择省</option>
+						         	#for(tpl : tplList)
+ 								    <option value="#(tpl.Org_Id)">#(tpl.Name)</option> 
+							        #end
+						           </select>
+						          </td>
+						        <td>
+						          <select name="second"  id="second" change="changeSSelect()" onchange="onchanged()";>
+							      <option selected="selected" value="value">请选择市级</option>
+						          </select> 
+						         </td>
+						       <td>
+						         <select name="third"  id="third" onchange="onchanged()";>
+							      <option selected="selected" value="value">请选择县级</option>
+						          </select>
+					            </td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;		         		     
+					           <td>    
+					                  <input type="text" name="Searcht" id="Searcht" value=""/><span> <input type="button" value="搜索" onclick="onclicked()"  /> </span>              
+			                     </td>
+			                      
+			                 </tr>						
+						     </div>	 					       
+						    <table id="pageTable" class="demo-add-niftycheck" data-toolbar="#del,#add"
+						               data-search="true"
+						               data-show-refresh="true"
+						               data-show-toggle="true"
+						               data-show-columns="true"
+						               data-sort-name="id"
+						               data-page-list="[5, 10, 20]"
+						               data-page-size="5"
+						               data-pagination="true" data-show-pagination-switch="true" data-toggle="table"></table>
+						    </div>
+						</div>
+			        </div>
+                </div>          
+<script>
+   EducationalValue='';   //定义变量存储对应下拉框的Value
+   ProfessionalValue='';
+   SearchValue='';
+   firstValue='';
+   secondValue='';
+   thirdValue='';
+	var col = [{
+	    field: 'Value2',
+	    title: '学历分类',
+	    align: 'center'
+	}, {
+	    field: 'TPName',
+	    title: '姓名',
+	    align: 'center'
+	}, {
+	    field: 'Value1',
+	    title: '专业分类',
+	    align: 'center'
+	  
+	}, {
+	    field: 'CreateTime',
+	    title: '创建时间',
+	    align: 'center'
+	},  {
+	    field: 'TP_Add',
+	    title: '现居地',
+	    align: 'center'
+	},{
+	    field: 'Tel',
+	    title: '联系电话',
+	    align: 'center'
+	},{
+	       field: 'TP_Id',
+	       title: '操作',
+	       align: 'center',
+		   formatter:function(value,row,index){
+		    	   var a = '';
+				   a = a + '<a class="label label-table label-success" onclick="doPjax(\''+ctx+'/admin/psourcemanage/edit?id='+value+'\')" href="javascript:void(0);" >编辑</a>&nbsp;';
+			       return a;
+		       }
+	   }];
+	var opt = {
+		    //请求方法
+			   method: 'get',
+			    //是否显示行间隔色
+			   striped: true,
+			   //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）     
+			   cache: false,  
+			   //data-toolbar: "#demo-delete-row",
+			   //是否显示分页（*）  
+			   pagination: true,   
+			    //是否启用排序  
+			   sortable: false,    
+			    //排序方式 
+			   sortOrder: "asc",    
+			   //初始化加载第一页，默认第一页
+			   //我设置了这一项，但是貌似没起作用，而且我这默认是0,- -
+			   //pageNumber:1,   
+			   //每页的记录行数（*）   
+			   pageSize: 10,  
+			   //可供选择的每页的行数（*）    
+			   pageList: [10, 25, 50, 100],
+			   //这个接口需要处理bootstrap table传递的固定参数,并返回特定格式的json数据  
+			   url: ctx+"/admin/psourcemanage/ListData",
+			   //默认值为 'limit',传给服务端的参数为：limit, offset, search, sort, order Else
+			   //queryParamsType:'',   
+			   ////查询参数,每次调用是会带上这个参数，可自定义                         
+			   queryParams : function(params) {
+			       return {
+			             pageNumber: ((params.offset+1)/params.limit)+1,
+			             pageSize: params.limit,
+			             EducationalValue: EducationalValue,
+			             ProfessionalValue:ProfessionalValue,
+			             SearchValue:SearchValue,
+			             firstValue: firstValue,
+			             secondValue: secondValue,
+			             thirdValue:thirdValue
+			           };
+			   },
+			   //分页方式：client客户端分页，server服务端分页（*）
+			   sidePagination: "server",
+			   //是否显示搜索
+			   search: false,  
+			   //Enable the strict search.    
+			   strictSearch: true,
+			   //Indicate which field is an identity field.
+			   idField : "id",
+			   columns: col,
+			   pagination:true
+			}; 
+		
+	//表格
+	function initTable(){
+		$('#pageTable').bootstrapTable(opt);
+		$('#pageTable').bootstrapTable('hideColumn', 'id');
+		$('#pageTable').bootstrapTable('hideColumn', 'proc_ins_id');
+		$('#pageTable').bootstrapTable('hideColumn', 'defid');
+
+	}
+	function refreshTable(){
+		$("#pageTable").bootstrapTable('refresh', opt);
+		$('#pageTable').bootstrapTable('hideColumn', 'id');
+		$('#pageTable').bootstrapTable('hideColumn', 'proc_ins_id');
+		$('#pageTable').bootstrapTable('hideColumn', 'defid');
+	} 	
+	function onchanged(){
+		EducationalValue = $("select[name='Educationaltype']").val();
+		ProfessionalValue = $("select[name='Professionaltype']").val();	
+	    firstValue=$("select[name='first']").val();
+	    secondValue=$("select[name='second']").val();
+	    thirdValue=$("select[name='third']").val();
+		if(EducationalValue=="--请选择--"){ EducationalValue='';  }
+		if(ProfessionalValue=="--请选择--")	{ ProfessionalValue='';  }
+		if(firstValue=="value"){ firstValue='';  }
+		if(secondValue=="value"){ secondValue='';  }
+		if(thirdValue=="value"){ thirdValue='';  }
+		 refreshTable();	
+	}
+	function onclicked(){
+		SearchValue = document.getElementById("Searcht").value;
+		//alert(SearchValue);
+		refreshTable();
+	}
+
+	$(document).ready(function(){
+		$("#first").change(function changeFSelect(){
+			var value = $("#first").val();
+			//alert(value);
+			$.post(
+					ctx+"/admin/psourcemanage/getChildTplocalization", //url
+					{parentId:value},
+					function(data){
+						//console.log(data);
+						var content="<option value='value'>请选择市级</option>";
+						//接收到json格式数据
+						//动态添加
+						for(var i=0;i<data.length;i++)
+						{
+							content+="<option value="+data[i].Org_Id+">"+data[i].Name+"</option>";
+						}
+						$("#second").html(content);
+					},
+					"json" //数据格式
+				);
+		});
+		
+		$("#second").change(function changeSSelect(){
+			var value = $("#second").val();
+			//alert(value);
+			$.post(
+					ctx+"/admin/psourcemanage/getChildTplocalization", //url
+					{parentId:value},
+					function(data){
+						//console.log(data);
+						var content="<option value='value'>请选择县级</option>";
+						//接收到json格式数据
+						//动态添加
+						for(var i=0;i<data.length;i++)
+						{
+							content+="<option value="+data[i].Org_Id+">"+data[i].Name+"</option>";
+						}
+						$("#third").html(content);
+					},
+					"json" //数据格式
+				);
+		});		
+		initFullHeight();//初始化高度
+		initTable();//初始化表格	
+	});
+</script>

@@ -1,0 +1,50 @@
+#include("/common/include/include.html")
+<div class="modal-dialog" style="width:100%">
+    <div class="modal-content" style="height: 100%;">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" onclick="{parent.layer.closeAll();}"><i class="pci-cross pci-circle"></i></button>
+            <h4 class="modal-title">给考核用户延期</h4>
+        </div>
+        <div class="modal-body">
+        	<form id="editForm" action="/admin/topicdelay/save" class="panel-body form-horizontal form-padding bv-form" novalidate="novalidate">
+        		<input type="hidden" name="topicDelay.id" value="#(d?d.id:'')">
+        		<input type="hidden" name="userids" value="#(userids)">
+                <div class="row">
+                    <label class="col-xs-3 control-label" for="demo-text-input">延期任务指标：</label>
+                    <div class="col-xs-9">
+                    	<select name="topicDelay.topicid" style="height:30px;">
+                    	#for(t : topicList)
+				 			<option value="#(t.id)">#(t.name)</option>
+						#end
+						</select> 
+                    </div>
+                </div>
+                <div class="row" id="yqTime" style="margin-top: 10px;">
+                    <label class="col-xs-3 control-label" for="demo-text-input">延期截止时间：</label> 
+					<div class="col-xs-9">
+                        <input type="text" name="topicDelay.yqendtime" style="height:30px;width:300px" readonly="" class="form-control" placeholder="延期截止时间" value="#(d?d.yqendtime:'')" onclick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd HH:mm:ss'})">
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px;">
+                    <label class="col-xs-3 control-label" for="demo-text-input">状态：</label>
+                    <div class="col-xs-9">
+                        <select name="topicDelay.stat" class="form-control" style="height:32px;width:100px" ;="">
+							<option value="1" #if(d&&d.stat == "1" ) selected="selected" #else  #end >开启</option>
+							<option value="0" #if(d&&d.stat == "0" ) selected="selected" #else  #end >关闭</option>
+						</select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+	function subsave(){
+		return $("#editForm");
+	}
+	$(document).ready(function() {
+		
+	});
+	
+</script>

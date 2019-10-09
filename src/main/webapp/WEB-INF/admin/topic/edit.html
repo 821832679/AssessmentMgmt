@@ -1,0 +1,136 @@
+#include("/common/include/pageTitleBread.html")
+<div id="page-content">
+		<div class="col-lg-12">
+	        <div class="panel">
+	            <div class="panel-heading">
+	                <h3 class="panel-title">编辑指标信息</h3>
+	            </div>
+	            <form id="editForm" class="panel-body form-horizontal form-padding">
+	                <div class="form-group">
+	                    <label class="col-md-3 control-label" for="demo-text-input">指标名称</label>
+	                    <div class="col-md-9">
+	                        <input type="text"  name="topic.name" class="form-control"  value="#(t?t.name:'')">
+	                         <input type="hidden"  name="topic.id" class="form-control" value="#(t?t.id:'')">
+	                    </div>
+	                </div>
+	                <div class="form-group">
+	                    <label class="col-md-3 control-label" for="demo-text-input">指标描述</label>
+	                    <div class="col-md-9">
+	                        <textarea rows="5" cols="5" name="topic.describle" class="form-control">#(t?t.describle:'')</textarea>
+	                    </div>
+	                </div>
+	                <div class="form-group">
+	                    <label class="col-md-3 control-label" for="demo-text-input">显示顺序</label>
+	                    <div class="col-md-4">
+	                        <input type="text" name="topic.sortvalue" class="form-control" value="#(t?t.sortvalue:0)">
+	                    </div>
+	                </div>
+	                <div class="form-group">
+	                    <label class="col-md-3 control-label" for="demo-text-input">状态</label>
+	                    <div class="col-md-9">
+	                        <select name="topic.status" class="form-control" style="height:32px;width:300px" ;>
+								<option value="1" #if(t&&t.status == "1" ) selected="selected" #else  #end >启用</option>
+								<option value="0" #if(t&&t.status == "0" ) selected="selected" #else  #end >禁用</option>
+							</select>
+	                    </div>
+	                </div>
+	                <div class="form-group" id="tbTime">
+	                    <label class="col-md-3 control-label" for="demo-text-input">填报起止日期</label> 
+						<div class="col-md-3">
+	                        <input type="text" id="begintime" name="topic.begintime" readonly class="form-control" placeholder="从" value="#(t?t.begintime:'')"  onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'endtime\')}'})">
+	                    </div>
+	                    <div class="col-md-3">
+	                        <input type="text" id="endtime" name="topic.endtime" readonly class="form-control" placeholder="到" value="#(t?t.endtime:'')"  onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'begintime\')}'})">
+	                    </div>
+	                </div>
+	                <div class="form-group" id="tbTime">
+	                    <label class="col-md-3 control-label" for="demo-text-input">区县评分时间</label> 
+						<div class="col-md-3">
+	                        <input type="text" id="qxbegintime" name="topic.qxbegintime" readonly class="form-control" placeholder="从" value="#(t?t.qxbegintime:'')"  onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'qxendtime\')}'})">
+	                    </div>
+	                    <div class="col-md-3">
+	                        <input type="text" id="qxendtime" name="topic.qxendtime" readonly class="form-control" placeholder="到" value="#(t?t.qxendtime:'')"  onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'qxbegintime\')}'})">
+	                    </div>
+	                </div>
+	                <div class="form-group" id="tbTime">
+	                    <label class="col-md-3 control-label" for="demo-text-input">专家评分时间</label> 
+						<div class="col-md-3">
+	                        <input type="text" id="zjbegintime" name="topic.zjbegintime" readonly class="form-control" placeholder="从" value="#(t?t.zjbegintime:'')"  onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'zjendtime\')}'})">
+	                    </div>
+	                    <div class="col-md-3">
+	                        <input type="text" id="zjendtime" name="topic.zjendtime" readonly class="form-control" placeholder="到" value="#(t?t.zjendtime:'')"  onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'zjbegintime\')}'})">
+	                    </div>
+	                </div>
+	                <div class="panel-footer">
+	                    <div class="row">
+	                        <div class="col-sm-9 col-sm-offset-3">
+	                            <button class="btn btn-warning" type="reset">重置</button>
+	                            <button class="btn btn-mint" type="submit" >保存</button>
+	                        </div>
+	                    </div>
+	                </div>
+	            </form>
+	        </div>
+	    </div>
+</div>
+<script>
+	function save(){
+		var data = common_ajax.ajaxFunc("/admin/topic/save", $('#editForm').serialize(), "json", null);
+		if(data.success){
+			pointLion.alertMsg("保存成功!" , "success" , "small" , function(){
+				doPjax(ctx+'/admin/topic/getListPage');//跳转到列表页
+			});
+		}else{
+			pointLion.alertMsg(data.message,"danger",null,function(){
+				$(".btn-mint").removeAttr("disabled");
+			});
+		}
+	}
+	$(document).ready(function() {
+		$('#editForm').bootstrapValidator({
+            fields: {
+            	"topic.name": {
+                    validators: {
+                        notEmpty: {
+                            message: '*主题名称不能为空'
+                        },
+                        stringLength: {/*长度提示*/
+                            max: 25,
+                            message: '*主题名称长度必须小于25'
+                        }
+                    }
+                },
+                "topic.describle": {
+                    validators: {
+                    	notEmpty: {
+                            message: '*主题描述不能为空'
+                        },
+                    	stringLength: {
+                            max: 2000,
+                            message: '主题描述信息长度必须小于1000'
+                        }
+                    }
+                },
+                "topic.score": {
+                    validators: {
+                        digits : {
+                            message : '字段必须是正整数'
+                        },
+                        greaterThan: {
+                            value : 1,
+                            message : '最小输入1'
+                        }/*,
+                        lessThan: {
+                            value : 100,
+                            message : '最大输入100'
+                        }*/
+                    }
+                }
+            }
+        }).on("success.form.bv", function (e) {
+        	console.log(e);
+            save();
+            return false;//阻止表单跳转
+        });
+	});
+</script>

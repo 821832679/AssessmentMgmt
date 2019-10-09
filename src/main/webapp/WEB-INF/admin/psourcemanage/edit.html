@@ -1,0 +1,557 @@
+ #include("/common/include/pageTitleBread.html")
+  <style>
+ .uploader-list{width:200px !important;}
+.wu-example,.btns,.webuploader-container{width:300px !important;margin-left:300px;}
+.note-editor {
+	margin-top: 20px !important;
+}
+ </style>
+
+<!-- 页面中input域的 name 采用 modelName.attrName 的形式，
+其中 modelName 为 ActiveInfo 类名的首字母变小写，
+即为：activeInfo，其下的属性名要完全保持一致，
+即为：activeInfo.activeName。最终在页面的形式是：
+<input name="activeInfo.activeName" ...>要注意大小写。 -->
+
+<div id="page-content">
+	<div class="col-lg-12">
+		<div class="panel">
+			<div class="panel-heading">
+				<h3 class="panel-title">人才录入</h3>
+			</div>
+			<form id="editForm" class="panel-body form-horizontal form-padding">
+				
+				<input type="hidden" name="tpsource.TP_Id" value="#(t?t.TP_Id:'')">
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">姓名</label>
+					<div class="col-md-2">
+						<input type="text" name="tpsource.TPName" value="#(t?t.TPName:'')"
+							class="form-control" />
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">性别</label>
+					<div class="col-md-2">
+						<select name="tpsource.Sex" class="form-control" ;>
+							<option value="男" #if(t&&t.Sex== "男") selected="selected" #else  #end >男</option>
+							<option value="女" #if(t&&t.Sex== "女") selected="selected" #else  #end>女</option>
+						</select>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">年龄</label>
+					<div class="col-md-2">
+						<input type="text" name="tpsource.Age"  value="#(t?t.Age:'')"
+							class="form-control"  />
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">联系电话</label>
+					<div class="col-md-2">
+						<input type="text" name="tpsource.Tel"  value="#(t?t.Tel:'')"
+							class="form-control"  />
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">现居住地</label>
+					<div class="col-md-2">
+						<select name="" class="form-control" 
+							id="tplfirst" change="changeFSelect()";>
+							<option value="value">选择所在省份</option>
+							#for(tpl : tplList)
+ 								<option value="#(tpl.Org_Id)">#(tpl.Name)</option> 
+							#end
+						</select>
+						
+						<select name="tpsource.municipallevel" class="form-control" 
+							id="tplsecond" change="changeSSelect()";>
+							<option value="value">选择所在市</option>
+						</select>
+						
+						<select name="tpsource.countylevel" class="form-control" 
+							id="tplthird";>
+							<option value="value">选择所在县</option>
+						</select>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input"></label>
+					<div class="col-md-8">
+						<input type="text" name="tpsource.TP_Add" class="form-control" value="#(t?t.TP_Add:'')" />
+					</div>	
+				</div>	
+					
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">邮箱</label>
+					<div class="col-md-2">
+						<input type="text" name="tpsource.Email"  value="#(t?t.Email:'')"
+							class="form-control"  />
+					</div>
+				</div>
+				
+				
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">所属机构</label>
+					<div class="col-md-2">
+						<select name="" class="form-control" 
+							id="tpofirst" change="changeTFSelect()";>
+							<option value="value">选择机构分类</option>
+							#for(tpo : tpoList)
+ 								<option value="#(tpo.Org_Id)">#(tpo.Name)</option> 
+							#end
+						</select>
+						
+						<select name="" class="form-control" 
+							id="tposecond" change="changeTSSelect()";>
+							<option value="value">选择所属机构</option>
+						</select>
+						
+						<select name="" class="form-control" 
+							id="tpothird";>
+							<option value="value">选择所属部门</option>
+						</select>
+						
+						<select name="" class="form-control"  style="display:none"
+							id="tpofourth";>
+							<option value="value">选择街道</option>
+						</select>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">职业</label>
+					<div class="col-md-2">
+						<input type="text" name="tpsource.Position"  value="#(t?t.Position:'')"
+							class="form-control"  />
+					</div>
+				</div>
+				
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">人才类型</label>
+					<div class="col-md-2">
+						<select name="tpsource.type" class="form-control" ;>
+							<option value="0" >专家</option>
+							<option value="1">人才</option>
+						</select>
+					</div>
+				</div>
+				
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">学历</label>
+					<div class="col-md-2">
+						<select name="tpsource.TPQ_Code" class="form-control" ;>
+							#for(tqp : tqpList)
+ 								<option value="#(tqp.TPQ_Code)" #if(t&&t.TPQ_Code==tqp.TPQ_Code) selected="selected" #else  #end >#(tqp.Value)</option> 
+							#end
+						</select>
+					</div>
+				</div>
+
+
+
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">上传头像</label>
+					<div id="initArticlePicUploader" class="wu-example">
+						<!--用来存放文件信息-->
+						<div id="fileList" class="uploader-list"></div>
+						<div class="btns">
+							<div id="filePicker">选择图片</div>
+						</div>
+						<div class="col-md-9">
+							<input type="hidden" id="picurl" name="tpsource.Icon_Url"
+								class="form-control" value="#(t?t.Icon_Url:'')">
+						</div>
+					</div>
+				</div>
+
+				<!-- <div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">上传头像</label>
+					<div class="col-md-2">
+						<input type="text" name="tpsource.Icon_Url" value="#(t?t.Icon_Url:'')"
+							class="form-control"  readonly />
+					</div>
+				</div> -->
+				
+				
+				
+				<!-- <div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">上传资料</label>
+					<div class="col-md-2">
+						<input type="text" name="" value="xxxxx资料"
+							class="form-control"  readonly />
+					</div>
+				</div> -->
+				
+				
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">政治面貌</label>
+					<div class="col-md-2">
+						<select name="tpsource.TPP_Code" class="form-control";>
+							#for(tpp : tppList)
+ 								<option value="#(tpp.TPP_Code)" #if(t&&t.TPP_Code==tpp.TPP_Code) selected="selected" #else  #end >#(tpp.Value)</option> 
+							#end
+						</select>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">艺术分类</label>
+					<div class="col-md-2">
+						<select name="tpsource.TPC_Code" class="form-control";>
+							#for(tpc : tpcList)
+ 								<option value="#(tpc.TPC_Code)" #if(t&&t.TPC_Code==tpc.TPC_Code) selected="selected" #else  #end >#(tpc.Value)</option> 
+							#end
+						</select>
+					</div>
+				</div>
+			
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">老师简介</label>
+					<div class="col-md-8">
+						<textarea name="tpsource.TeacherIntroduction" class="form-control"
+							 cols="30" rows="10" id="subtitle2"></textarea>
+						 <input type="hidden" id="subtitle3" class="form-control" value="#(t?t.TeacherIntroduction:'')" />
+						<small class="help-block">请输入老师简介</small>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="demo-text-input">自定义信息</label>
+					<div class="col-md-8">
+						<textarea name="tpsource.Opus" class="form-control"
+							 cols="30" rows="10" id="subtitle"></textarea>
+						 <input type="hidden" id="subtitle1" class="form-control" value="#(t?t.Opus:'')" />
+						<small class="help-block">请输入自定义信息</small>
+					</div>
+				</div>
+
+				<div class="panel-footer">
+					<div class="row">
+						<div class="col-sm-9 col-sm-offset-3">
+							<a class="btn btn-warning" onclick="doPjax('#(ctx)/admin/psourcemanage/getListPage')" href="javascript:void(0);">返回</a>					
+							<button class="btn btn-mint" type="button" onclick="doSave()">提交</button>
+						</div>
+					</div>
+				</div>
+				
+			</form>
+		</div>
+	</div>
+</div>
+<script>
+//页面初始化
+$(document).ready(function() {
+	
+
+	//获得市ajax
+	
+	$("#tplfirst").change(function changeFSelect(){
+		var value = $("#tplfirst").val();
+		//alert(value);
+		$.post(
+				ctx+"/admin/psourcemanage/getChildTplocalization", //url
+				{parentId:value},
+				function(data){
+					//console.log(data);
+					var content="<option value='value'>选择所在市</option>";
+					//接收到json格式数据
+					//动态添加
+					for(var i=0;i<data.length;i++)
+					{
+						content+="<option value="+data[i].Org_Id+">"+data[i].Name+"</option>";
+					}
+					$("#tplsecond").html(content);
+				},
+				"json" //数据格式
+			);
+	});
+	
+	//获得县ajax
+	$("#tplsecond").change(function changeSSelect(){
+		var value = $("#tplsecond").val();
+		//alert(value);
+		$.post(
+				ctx+"/admin/psourcemanage/getChildTplocalization", //url
+				{parentId:value},
+				function(data){
+					//console.log(data);
+					var content="<option value='value'>选择所在县</option>";
+					//接收到json格式数据
+					//动态添加
+					for(var i=0;i<data.length;i++)
+					{
+						content+="<option value="+data[i].Org_Id+">"+data[i].Name+"</option>";
+					}
+					$("#tplthird").html(content);
+				},
+				"json" //数据格式
+			);
+	});
+	
+	
+	//获得子机构ajax
+	$("#tpofirst").change(function changeTFSelect(){
+		var value = $("#tpofirst").val();
+		//alert(value);
+		$.post(
+				ctx+"/admin/psourcemanage/getChildTppolitical", //url
+				{parentId:value},
+				function(data){
+					//console.log(data);
+					var content="<option value='value'>选择所属机构</option>";
+					//接收到json格式数据
+					//动态添加
+					for(var i=0;i<data.length;i++)
+					{
+						content+="<option value="+data[i].Org_Id+">"+data[i].Name+"</option>";
+					}
+					$("#tposecond").html(content);
+				},
+				"json" //数据格式
+			);
+	});
+	//获得子机构ajax
+	$("#tposecond").change(function changeTSSelect(){
+		var value = $("#tposecond").val();
+		//alert(value);
+		$.post(
+				ctx+"/admin/psourcemanage/getChildTppolitical", //url
+				{parentId:value},
+				function(data){
+					//console.log(data);
+					var content="<option value='value'>选择所属部门</option>";
+					//接收到json格式数据
+					//动态添加
+					for(var i=0;i<data.length;i++)
+					{
+						content+="<option value="+data[i].Org_Id+">"+data[i].Name+"</option>";
+					}
+					$("#tpothird").html(content);
+				},
+				"json" //数据格式
+			);
+	});
+	
+	//获得子机构ajax
+	$("#tpothird").change(function changeTSSelect(){
+		var value = $("#tpothird").val();
+		//alert(value);
+		$.post(
+				ctx+"/admin/psourcemanage/getChildTppolitical", //url
+				{parentId:value},
+				function(data){
+					//console.log(data);
+					var content="<option value='value'>选择所属街道</option>";
+					//接收到json格式数据
+					//动态添加
+					if(data.length!=0){
+					for(var i=0;i<data.length;i++)
+					{
+						content+="<option value="+data[i].Org_Id+">"+data[i].Name+"</option>";
+					}
+					$("#tpofourth").css("display","inline");
+					$("#tpofourth").html(content);
+					}
+					if(data.length==0){
+					$("#tpofourth").css("display","none");
+					}
+					
+				},
+				"json" //数据格式
+			);
+	});
+	
+	
+});
+var txt1=document.getElementById('subtitle1').value;
+$('#subtitle').val(txt1);
+
+var txt2=document.getElementById('subtitle3').value;
+$('#subtitle2').val(txt2);
+		
+	
+		//表单校验
+		/* 
+		bootstrapValidator
+		
+		notEmpty：非空验证；
+
+		stringLength：字符串长度验证；
+		
+		regexp：正则表达式验证；
+		
+		emailAddress：邮箱地址验证（都不用我们去写邮箱的正则了~~）
+		
+		除此之外，在文档里面我们看到它总共有46个验证类型，我们抽几个常见的出来看看：
+		
+		base64：64位编码验证；
+		
+		between：验证输入值必须在某一个范围值以内，比如大于10小于100；
+		
+		creditCard：身份证验证；
+		
+		date：日期验证；
+		
+		ip：IP地址验证；
+		
+		numeric：数值验证；
+		
+		phone：电话号码验证；
+		
+		uri：url验证；
+		*/
+		
+		function formValidate(){
+			$('#editForm').bootstrapValidator({
+	    		excluded:[":disabled"],
+	            fields: {
+	            	"tpsource.TPName": {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '姓名不能为空'
+	                        },
+	                        stringLength: {
+	                            max: 8,
+	                            message: '姓名不能超过8个字'
+	                        }
+	                    }
+	               },
+	               "tpsource.Sex": {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '性别不能为空',
+	                        }
+	                    }
+	               },
+	               "tpsource.Age": {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '年龄不能为空'
+	                        },
+	                        stringLength: {
+	                            max: 2,
+	                            message: '年龄不能超过3位'
+	                        },
+	                        regexp: {
+	                            regexp: /^[0-9]*$/,
+	                            message: '年龄只能由数字组成'
+	                       }
+	                    }
+	               },"tpsource.TP_Add": {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '现居住地不能为空'
+	                        }
+	                    }
+	               },
+	               "tpsource.Tel": {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '电话号码不能为空'
+	                        },
+	                        stringLength: {
+	                            max: 11,
+	                            message: '电话号码不能超过11位'
+	                        },
+	                        regexp: {
+	                            regexp: /^[0-9]*$/,
+	                            message: '电话号码只能由数字组成'
+	                       }
+	                    }
+	               },
+	               "tpsource.Email": {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '邮箱不能为空'
+	                        },
+	                        emailAddress:{
+	                        	message: '邮箱格式不正确'
+	                        }
+	                    }
+	               },
+	               "tpsource.Org_Id": {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '所属机构不能为空'
+	                        }
+	                    }
+	               },
+	               "tpsource.Position": {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '职业不能为空'
+	                        }
+	                    }
+	               },
+	               "tpsource.TPQ_Code": {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '学历不能为空'
+	                        }
+	                    }
+	               },
+	               "tpsource.TPP_Code": {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '政治面貌不能为空'
+	                        }
+	                    }
+	               },
+	               "tpsource.TPC_Code": {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '人才类型不能为空'
+	                        }
+	                    }
+	               }
+	            }
+	        }).bootstrapValidator('validate');
+		}
+		//进行保存
+		function doSave(){
+			var content = $("#demo-summernote").summernote('code');
+			$("#content").val(content);
+			var validator = formValidate();//表单校验
+			var va = $("#editForm").data('bootstrapValidator').isValid();
+			if(va){
+				save();
+			}
+		}
+		
+		function save(){
+			/* var str = "http://localhost:8080/JFinalOA/common/img/temp";
+			if(txt7.indexOf(str) != -1){
+				//有域名
+				var txtpic=txt7.substring(28);
+				$("#picurl").val(txtpic);
+			}else{
+				var txtp=txt7.substring(0);
+				$("#picurl").val(txtp);
+			} */
+			var data = common_ajax.ajaxFunc("/admin/psourcemanage/save", $('#editForm').serialize(), "json", null);
+			//alert($('#editForm').serialize());
+			if(data.success){
+				pointLion.alertMsg("保存成功!" , "success" , "small" , function(){
+					doPjax(ctx+'/admin/psourcemanage/getListPage');//跳转到列表页
+				});
+			}else{
+				pointLion.alertMsg("保存失败,请检查是否有未填的字段!" , "fail" , "small" );
+				};
+			}
+		
+		var txt7=document.getElementById('picurl').value;
+		var pic='<img src="'+txt7 +'" style="width:200px;height:120px;">';
+		$('#fileList').append(pic);
+		pointLion.initArticlePicUploader('picurl');
+	</script>

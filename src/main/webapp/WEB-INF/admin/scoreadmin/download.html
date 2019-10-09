@@ -1,0 +1,46 @@
+#include("/common/include/include.html")
+<div class="modal-dialog" style="width:100%">
+    <div class="modal-content" style="height: 100%;">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" onclick="{parent.layer.closeAll();}"><i class="pci-cross pci-circle"></i></button>
+            <h4 class="modal-title">指标考核统计</h4>
+        </div>
+        <div class="panel-body">
+       		<input type="hidden" id="orgid"/> 	
+       		<input type="hidden" id="Searcht" value=""/>
+       		<span>
+       			任务指标：
+       			<select name="topicid" id="topicid"  onchange="onchanged()" style="height: 23px;">
+                  	#for(t : topicList)
+		 			<option value="#(t.id)">#(t.name)</option>
+					#end
+				</select>
+			</span>
+			<br/><br/>
+            <span> <input type="button" value="按区县统计" onclick="downloadAll()"/> </span>
+	    </div>
+	    </div>
+        <div class="modal-body">
+        	<form id="editForm" action="/admin/topicdelay/save" class="panel-body form-horizontal form-padding bv-form" novalidate="novalidate">
+        		
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+	function subsave(){
+		return $("#editForm");
+	}
+	$(document).ready(function() {
+		onchanged();
+	});
+	var topicid = "0";
+	function onchanged(){
+		topicid = $("select[name='topicid']").val();
+	}
+	function downloadAll(){
+		location.href = ctx+"/admin/scoreadmin/downloadAll?topicid="+topicid;
+	}
+	
+</script>

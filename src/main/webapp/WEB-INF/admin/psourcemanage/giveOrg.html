@@ -1,0 +1,63 @@
+#include("/common/include/include.html")
+<style>
+	.lay-body{
+		margin-top: 52px;
+		overflow-y: auto;
+		overflow-x: unset;
+	}
+	.lay-header{
+		position: absolute;
+		top: 0px;
+		width: 100%;
+	}
+</style>
+<div class="modal-dialog" style="width:100%">
+    <div class="modal-content" style="min-height: 100%;">
+        <div class="modal-header lay-header">
+            <button type="button" class="close" data-dismiss="modal" onclick="{parent.layer.closeAll();}"><i class="pci-cross pci-circle"></i></button>
+            <h4 class="modal-title">湖南省文化厅行政机构</h4>
+        </div>
+
+        <div class="modal-body lay-body">
+            <ul id="treeDemo" class="ztree"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+	var orgName = '';
+	//树
+	var setting = {
+		/* check: {
+			enable: true
+		}, */
+		async : {
+			enable : true,
+			url:ctx+"/admin/org/getOrgTree"
+			//url : ctx + "/admin/psourcemanage/getAllTopOrgTree"
+		},
+		callback: {
+			onClick  : function(event, treeId, treeNode){
+				//console.log(treeNode.name);
+				orgName =  treeNode.name;
+			}
+		}
+	};
+	
+	//获取选择的节点
+	function getCheckedNodes(){
+		/* var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+		console.log(treeObj);
+		var nodes = treeObj.getCheckedNodes(true);
+		return nodes; */
+		return orgName;
+	}
+	$(document).ready(function() {
+		$.fn.zTree.init($("#treeDemo"), setting);//初始化树
+		var clientH = document.body.clientHeight-54;
+		$(".lay-body").css("height",clientH+"px");
+		
+		
+		
+	});
+</script>

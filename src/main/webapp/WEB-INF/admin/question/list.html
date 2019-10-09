@@ -1,0 +1,256 @@
+<div id="page-title">
+	<h1 class="page-header text-overflow">#(pageTitleBread.pageTitle)</h1>
+</div>
+<ol class="breadcrumb">
+	<li><a href="javascript:void(0);">首页</a></li>
+	<li><a href="javascript:void(0);" onclick="doPjax('#(ctx)#(pageTitleBread.url)?topicid=#(topicid)')">#(pageTitleBread.pageTitle)</a></li>
+	<li class="active">#(pageTitleBread.nowBread)</li>
+	<li>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="doPjax('#(ctx)/admin/topic/getListPage')"><font style="color: red;">返回指标列表</font></a></li>
+</ol>
+<div id="page-content">
+	<div class="col-sm-12 eq-box-sm">
+		<div class="panel lion-fullHeight">
+			<div class="panel-body">
+			    <a id="add" class="btn btn-info data-toolbar" onclick="doPjax('#(ctx)/admin/question/getEditPage?topicid=#(topicid)')" href="javascript:void(0);"><i class="glyphicon glyphicon-plus"></i> 添加</a>
+				<a id="del" class="btn btn-danger data-toolbar" onclick="delSel()" href="javascript:void(0);"><i class="glyphicon glyphicon-trash"></i> 批量删除</a>
+				<a id="enable" class="btn btn-success data-toolbar" onclick="enable()" href="javascript:void(0);"><i class="glyphicon glyphicon-ok"></i> 批量启用</a>
+				<a id="disable" class="btn btn-primary data-toolbar" onclick="disable()" href="javascript:void(0);"><i class="glyphicon glyphicon-remove"></i> 批量禁用</a>
+				<a id="add" class="btn btn-info data-toolbar" onclick="doPjax('#(ctx)/admin/topictype/getListPage')" href="javascript:void(0);"><i class="glyphicon glyphicon-plus"></i> 设置指标类型</a>
+				<div style="text-align: center;">
+		                                         状态：<select name="Statustype" id="Statustype" onchange="onchanged()" style="height: 25px;">	
+		                <option selected="selected">--请选择--</option>			                 			                  
+	                    <option  >启用</option>
+	                    <option  >禁用</option>
+                        </select>		     
+		             <input type="text" name="Searcht" id="Searcht" value="" placeholder="请输入考核名称、考核描述进行搜索" style="width: 250px;margin-left: 100px;"/>
+		             <span> <input type="button" value="搜索" onclick="onclicked()"/> </span>
+			     </div>
+		        <table id="pageTable" class="demo-add-niftycheck" data-toolbar="#del,#add,#enable,#disable"
+		               data-search="true"
+		               data-show-refresh="true"
+		               data-show-toggle="true"
+		               data-show-columns="true"
+		               data-sort-name="id"
+		               data-page-list="[5, 10, 20]"
+		               data-page-size="5"
+		               data-pagination="true" data-show-pagination-switch="true" data-toggle="table">
+		               <thead>
+			               <tr></tr>
+			               <tr></tr>
+			               <tr></tr>
+			               <tr></tr>
+			               <tr></tr>
+		               </thead>
+		               <tbody>
+		               </tbody>
+		         </table>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+//查询考核指标类型
+	var data = common_ajax.ajaxFunc("/admin/topictype/listStatusData", "StatusValue=1", "json", null);
+	var rows = [];
+	if(data.success){
+		rows = data.rows;
+		for(var i in rows){
+			
+			//$("#editForm").find("select[name='question.typeid']").append("<option value='"+rows[i].id+"'>"+rows[i].name+"</option>");
+		}
+	}
+	StatusValue='';
+	SearchValue='';
+	var col = [{
+		 field: 'checked',
+	     checkbox : true,
+	     align: 'center'
+	   },{
+		 field:'typeid',
+		 title: '指标类型',
+	     align: 'center',
+	   	 width:'200',
+	   	 formatter:function(value,row,index){
+		   		for(var i in rows){
+					if(value==rows[i].id){
+						return rows[i].name;
+					}
+				}
+				return "";
+         	} 
+	   },{
+		 field:'describle',
+		 title: '指标描述',
+	     align: 'center'
+	   },{
+		 field:'sortvalue',
+		 title: '排序',
+	     align: 'center',
+	     width:'100',
+	   },{
+		 field:'status',
+		 title: '状态',
+	     align: 'center',
+		 width:'100',
+	     formatter:function(value,row,index){
+	           var a = '';
+	           		if(row.status=='0'){
+	           			a = a + '<font style="color:red;">禁用</font>';
+	           		}else{
+	           			a = a + '启用';
+	           		}
+				return a;
+	       } 
+	   },{
+		 field:'createtime',
+		 title: '创建时间',
+	     align: 'center',
+	     width:'150',
+	   },{
+		 field:'id',
+		 title: '操作',
+	     align: 'center',
+	     width:'200',
+	     formatter:function(value,row,index){
+	           //通过formatter可以自定义列显示的内容
+	           //value：当前field的值
+	           //row：当前行的数据
+	           var a = '';
+					a = a + '<a class="label label-table label-success" onclick="doPjax(\''+ctx+'/admin/question/getEditPage?id='+row.id+'&topicid=#(topicid)\')" href="javascript:void(0);" >编辑</a>&nbsp;';
+					a = a + '<a class="label label-table label-danger" onclick="del(\''+row.id+'\')" href="javascript:void(0);" >删除</a>';
+	           return a;
+	       } 
+	}]
+	var opt = {
+       //是否显示行间隔色
+	   striped: true,
+	   //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）     
+	   cache: false,  
+	   //data-toolbar: "#demo-delete-row",
+	   //是否显示分页（*）  
+	   pagination: true,   
+	    //是否启用排序  
+	   sortable: false,    
+	    //排序方式 
+	   sortOrder: "asc",    
+	   //初始化加载第一页，默认第一页
+	   //我设置了这一项，但是貌似没起作用，而且我这默认是0,- -
+	   //pageNumber:1,   
+	   //每页的记录行数（*）   
+	   pageSize: 10,  
+	   //可供选择的每页的行数（*）    
+	   pageList: [10, 25, 50, 100],
+       //这个接口需要处理bootstrap table传递的固定参数,并返回特定格式的json数据  
+	   url: ctx+"/admin/question/listData?topicid=#(topicid)",
+		////查询参数,每次调用是会带上这个参数，可自定义                         
+	   queryParams : function(params) {
+	       return {
+	             pageNumber: ((params.offset+1)/params.limit)+1,
+	             pageSize: params.limit,
+	             StatusValue:StatusValue,
+	             SearchValue:SearchValue
+	           };
+	   },
+	   //分页方式：client客户端分页，server服务端分页（*）
+	   sidePagination: "server",
+	   //是否显示搜索
+	   search: false,  
+	   //Enable the strict search.    
+	   strictSearch: true,
+	   //Indicate which field is an identity field.
+	   idField : "id",
+	   columns: col,
+	   pagination:true
+	};
+	
+	//批量启用
+	function enable(){
+		var data = [];
+		$("#pageTable input[type='checkbox'][name!='btSelectAll']:checked").each(function(){
+			data.push($(this).val());
+		});
+		if(data.length==0){
+			pointLion.alertMsg("请选择要启用的数据!","danger",null,null);
+			return;
+		}
+		status(data.join(","),'启用',1);//执行启用
+	}
+	//批量禁用
+	function disable(){
+		var data = [];
+		$("#pageTable input[type='checkbox'][name!='btSelectAll']:checked").each(function(){
+			data.push($(this).val());
+		});
+		if(data.length==0){
+			pointLion.alertMsg("请选择要禁用的数据!","danger",null,null);
+			return;
+		}
+		status(data.join(","),"禁用",0);//执行禁用
+	}
+
+	function status(ids,str,val,){
+		pointLion.confimMsg("您是否要"+str+"所选信息 ?<br/> 点击确认进行"+str+" , 点击取消取消该操作",null,function(){
+			//执行启用、禁用
+			var data = common_ajax.ajaxFunc("/admin/question/status?status="+val,{"ids":ids}, "json", null);
+			//启用、禁用结果
+			if(data.success){
+				pointLion.alertMsg(data.message,"success",null,function(){
+					doPjax(ctx+'/admin/question/getListPage?topicid=#(topicid)');//跳转到列表页
+				});
+			}else{
+				pointLion.alertMsg(data.message,"success",null,null);
+			}
+		});
+	};
+	
+	//批量删除
+	function delSel(){
+		var data = [];
+		$("#pageTable input[type='checkbox'][name!='btSelectAll']:checked").each(function(){
+			data.push($(this).val());
+		});
+		if(data.length==0){
+			pointLion.alertMsg("请选择要删除的数据!","danger",null,null);
+			return;
+		}
+		del(data.join(","));//执行删除
+	}
+	//删除
+	function del(ids){
+		pointLion.confimMsg("您是否要删除所选信息 ?<br/> 点击确认进行删除 , 点击取消取消该操作",null,function(){
+			//执行删除
+			var data = common_ajax.ajaxFunc("/admin/question/delete",{"ids":ids}, "json", null);
+			//删除结果
+			if(data.success){
+				pointLion.alertMsg(data.message,"success",null,function(){
+					doPjax(ctx+'/admin/question/getListPage?topicid=#(topicid)');//跳转到列表页
+				});
+			}else{
+				pointLion.alertMsg(data.message,"success",null,null);
+			}
+		});
+	};
+	
+	function initTable(){
+		$('#pageTable').bootstrapTable(opt);
+	}
+	function refreshTable(){
+		$("#pageTable").bootstrapTable('refresh', opt);
+	}
+	function onchanged(){
+		StatusValue = $("select[name='Statustype']").val();
+		if(StatusValue=="--请选择--"){ StatusValue="";  } 
+		  else if(StatusValue=="启用"){StatusValue='1'; }
+		    else {StatusValue='0';} 
+		 refreshTable();	
+	}
+	function onclicked(){
+		SearchValue = document.getElementById("Searcht").value;
+		refreshTable();
+	}
+	
+	$(document).ready(function(){
+		initFullHeight();//初始化高度
+		initTable();//初始化表格
+	});
+</script>

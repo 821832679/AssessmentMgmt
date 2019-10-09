@@ -1,0 +1,108 @@
+				#include("/common/include/pageTitleBread.html")
+                <div id="page-content">
+			        <div class="col-sm-12 eq-box-sm">
+			        	<div class="panel lion-fullHeight">
+						    <div class="panel-body">
+						        <!-- <a id="add" class="btn btn-info data-toolbar" onclick="doPjax('#(ctx)/admin/db/backupAll')" href="javascript:void(0);"><i class="demo-pli-add"></i> 备份</a><br> -->
+						        <a id="add" class="btn btn-info data-toolbar" onclick="save()" href="javascript:void(0);"><i class="demo-pli-add"></i> 备份</a><br>
+						        <label>数据库名:#(databaseName)</label><br>
+						        <label>数据库类型:#(dbtype)</label><br>
+						        <label>数据库表:</label><br>
+						        <table id="pageTable" class="demo-add-niftycheck" data-toolbar="#del,#add"
+						               data-search="true"
+						               data-show-refresh="true"
+						               data-show-toggle="true"
+						               data-show-columns="true"
+						               data-sort-name="id"
+						               data-page-list="[5, 10, 20]"
+						               data-page-size="5"
+						               data-pagination="true" data-show-pagination-switch="true" data-toggle="table">
+						               <thead>
+							               <tr>序号</tr>
+							               <tr>表名</tr>
+						               </thead>
+						               <tbody>
+						               	#for(t:varList)
+						               		<tr>
+						               			<td>#(for.index+1)</td>
+						               			<td style="text-align: center; ">#(t)</td>
+						               		</tr>
+						               	#end
+						               </tbody>
+						         </table>
+						    </div>
+						</div>
+			        </div>
+                </div>
+				<script>
+				
+				function save(){
+					//var data = common_ajax.ajaxFunc("/admin/usecar/save", $('#editForm').serialize(), "json", null);
+					var data = common_ajax.ajaxFunc("/admin/db/backupAll",null,"json",null);
+					if(data.success){
+						pointLion.alertMsg("备份成功!" , "success" , "small" , function(){
+							doPjax(ctx+'/admin/db/getAllTable');//跳转到列表页
+						});
+					}else{
+						pointLion.alertMsg("备份成功!" , "fail" , "small" , function(){
+							doPjax(ctx+'/admin/db/getAllTable');//跳转到列表页
+						});
+					}
+				}
+				
+				
+				var col = [{
+					 title: '序号',
+				     align: 'center'
+				},
+				{
+					 title: '表名',
+				     align: 'center'
+				}]
+				var opt = {
+						
+					       //是否显示行间隔色
+						   striped: true,
+						   //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）     
+						   cache: false,  
+						   //data-toolbar: "#demo-delete-row",
+						   //是否显示分页（*）  
+						   pagination: true,   
+						    //是否启用排序  
+						   sortable: false,    
+						    //排序方式 
+						   sortOrder: "asc",    
+						   //初始化加载第一页，默认第一页
+						   //我设置了这一项，但是貌似没起作用，而且我这默认是0,- -
+						   //pageNumber:1,   
+						   //每页的记录行数（*）   
+						   pageSize: 10,  
+						   //可供选择的每页的行数（*）    
+						   pageList: [10, 25, 50, 100],
+						   //分页方式：client客户端分页，server服务端分页（*）
+						   sidePagination: "server",
+						   //是否显示搜索
+						   search: false,  
+						   //Enable the strict search.    
+						   strictSearch: true,
+						   //Indicate which field is an identity field.
+						   idField : "id",
+						   columns: col,
+						   pagination:true
+						   
+				};
+				function initTable(){
+					$('#pageTable').bootstrapTable(opt);
+				
+
+				}
+				function refreshTable(){
+					$("#pageTable").bootstrapTable('refresh', opt);
+				
+				}
+				
+				$(document).ready(function(){
+					initFullHeight();//初始化高度
+					initTable();//初始化表格
+				});
+                </script>

@@ -1,0 +1,160 @@
+<link href="#(ctx)/common/css/redis.css" rel="stylesheet">
+<style>
+	.form-control {
+	    padding: 0px;
+	}
+	.col-md-8 label {
+	    padding: 0 5px 0 0;
+	    line-height: 21px;
+	}
+	.col-md-8 label input {
+	    vertical-align: text-bottom;
+	    margin-bottom: 1px;
+	}
+	.answer-file{
+		font-family: 仿宋;
+	    font-size: 18px;
+	    color: #337ab7;
+	    font-weight: bold;
+	}
+	ul,li{ list-style:none;}
+	.fixed_item{
+		position:fixed;
+		right:46px;
+		top:12%;
+		width:45px;
+		z-index:9999;
+	}
+	.fixed_item li{
+		float:left;
+		width:30px;
+		height:30px;
+		background:#00b3ca;
+		border-radius:50%;
+		font-size:17px;
+		color:#fff;
+		line-height:32px;
+		text-align:center;
+		margin-bottom:10px;
+	}
+	.fixed_item li a{ color:#fff;}	
+	.fixed_item li:hover{ background:#0093a6;}
+</style>
+<div class="fixed_item">
+	<ul>
+		#(itemhtml)
+	</ul>
+</div>
+<div id="page-title">
+	<h1 class="page-header text-overflow">#(pageTitleBread.pageTitle)</h1>
+</div>
+<ol class="breadcrumb">
+	<li><a href="javascript:void(0);">首页</a></li>
+	<li><a href="javascript:void(0);" onclick="doPjax('#(ctx)#(pageTitleBread.url)?topicid=#(topicid)')">#(pageTitleBread.pageTitle)</a></li>
+	<li class="active">#(pageTitleBread.nowBread)</li>
+</ol>
+<div class="col-md-offset-2 col-md-8" style="text-align: center;width: 100%;margin-left: 0px;">
+    <h1>#(topic?topic.name:'')</h1>
+</div>
+<div class="col-md-offset-2 col-md-8" style="width: 100%;margin-left: 0px;">
+   <div class="panel panel-default">
+   		<div class="panel-body" style="padding: 18px;">
+			<div class="col-md-4" style="color: red;">考核时间：#(topic?topic.begintime:'00:00') ~ #(topic?topic.endtime:'00:00')</div>
+			<div class="col-md-4">
+				区县评分时间：#(topic?topic.qxbegintime:'00:00') ~ #(topic?topic.qxendtime:'00:00')
+				#if(yqshendtime!=null )
+					<br/>
+					审核延期截止日期：#(yqshendtime) 
+				#else  #end
+			</div>
+			<div class="col-md-4">专家评分时间：#(topic?topic.zjbegintime:'00:00') ~ #(topic?topic.zjendtime:'00:00')</div>
+		</div>
+   </div>
+</div>
+<div class="col-md-offset-2 col-md-8" style="width: 100%;margin-left: 0px;">
+    #(sjhtml)
+</div>
+<div class="col-md-offset-2 col-md-8" style="width: 100%;margin-left: 0px;">
+    <div class="panel panel-default space">
+        <div class="panel-heading">
+            <h3 class="panel-title">市州评分</h3>
+        </div>
+        <form id="qxForm" class="panel-body form-horizontal form-padding" method="post">
+			<input type="hidden" name="score.topicid" class="form-control" value="#(t?t.topicid:'')">
+			<input type="hidden" name="score.id" class="form-control" value="#(t?t.id:'')">
+			<input type="hidden" name="score.userid" class="form-control" value="#(t?t.userid:'')">
+			<input type="hidden" id="evaluate" class="form-control" value="#(t?t.evaluate:'')">
+	        <div class="panel-body">
+	        	<div class="evaluate_div">
+	        		<lable>市州对本次指标列表最终打分：</lable>
+	        		<div class="radio-check"><input type="radio" name="score.evaluate" id="evaluate1" value="优秀" onclick="check()"><label for="evaluate1">优秀</label></div>
+	        		<div class="radio-check"><input type="radio" name="score.evaluate" id="evaluate2" value="合格" onclick="check()"><label for="evaluate2">合格</label></div>
+	        		<div class="radio-check"><input type="radio" name="score.evaluate" id="evaluate3" value="不合格" onclick="check()"><label for="evaluate3">不合格</label></div>
+	        	</div>
+			    <div class="evaluate_div">
+			    	<lable>市州对对本次录入人的评价：</lable>
+			    	<textarea class="form-control" rows="8" cols="5" style="width: 100%;margin-top: 5px;" name="score.describle">#(t?t.describle:'')</textarea>
+			    </div>
+	        </div>
+			<div class="col-md-offset-5 col-md-2" style="padding-bottom: 50px;" id="khks">
+			    <button class="btn btn-danger" type="reset">重置评分</button>&nbsp;&nbsp;
+				<button class="btn btn-primary" type="button" onclick="save();">提交评分</button>
+			</div>
+			<div class="col-md-offset-5 col-md-2" style="padding-bottom: 50px;display: none;" id="khjstime">
+				<button class="btn btn-danger" type="button" disabled="disabled">当前考核专家已评分，市州评分已结束</button>
+			</div>
+	     </form>
+    </div>
+</div>
+<script type="text/javascript">
+	function save(){
+		if(check() && checkZJ()){
+			var data = common_ajax.ajaxFunc("/admin/score/save", $('#qxForm').serialize(), "json", null);
+			if(data.success){
+				pointLion.alertMsg("市州评分提交成功!" , "success" , "small" , function(){
+					doPjax(ctx+'/admin/score/getListPage');//跳转到列表页
+				});
+			}
+		}
+	}
+	function check(){
+		if(!#(topicTimeStat)){
+			pointLion.alertMsg("当前未在区县评分时间之内(#(topic?topic.qxbegintime:'00:00') ~ #(topic?topic.qxendtime:'00:00'))，无法评分" , "warning" , "small" , null);
+			return false;
+		}
+		return true;
+	}
+
+	function checkZJ(){
+		if('#(t.zjid)'!=null && '#(t.zjid)'!=""){
+			pointLion.alertMsg("当前考核专家已评分，市州评分已结束" , "warning" , "small" , null);
+			return false;
+		}
+		return true;
+	}
+	function saveAnswer(obj){
+		if(check()){
+			if($(obj).val()!=null && $(obj).val()!=""){
+				var param = "answer.id="+$(obj).attr("name")+"&answer.evaluate="+$(obj).val();
+				var data = common_ajax.ajaxFunc("/admin/answer/save", param, "json", null);
+				if(data.success){
+					console.log(data);
+				}
+			}
+		}
+	}
+	
+	var arr=[];
+	for (var i = 0; i < #(total); i++) {
+		arr[i]= new UE.ui.Editor({readonly:true,})
+		arr[i].render('content'+(i+1));
+	}
+	var evaluate = $("#evaluate").val();
+	if(evaluate=="优秀"){
+		$("#qxForm").find("input[name='score.evaluate']:eq(0)").attr("checked",true);
+	}else if(evaluate=="合格"){
+		$("#qxForm").find("input[name='score.evaluate']:eq(1)").attr("checked",true);
+	}else if(evaluate=="不合格"){
+		$("#qxForm").find("input[name='score.evaluate']:eq(2)").attr("checked",true);
+	}
+</script>

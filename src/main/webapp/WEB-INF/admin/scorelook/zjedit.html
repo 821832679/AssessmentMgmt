@@ -1,0 +1,142 @@
+<style>
+	.form-control {
+	    padding: 0px;
+	}
+	.col-md-8 label {
+	    padding: 0 5px 0 0;
+	    line-height: 21px;
+	}
+	.col-md-8 label input {
+	    vertical-align: text-bottom;
+	    margin-bottom: 1px;
+	}
+	.answer-file{
+		font-family: 仿宋;
+	    font-size: 18px;
+	    color: #337ab7;
+	    font-weight: bold;
+	}
+	ul,li{ list-style:none;}
+	.fixed_item{
+		position:fixed;
+		right:46px;
+		top:12%;
+		width:45px;
+		z-index:9999;
+	}
+	.fixed_item li{
+		float:left;
+		width:30px;
+		height:30px;
+		background:#00b3ca;
+		border-radius:50%;
+		font-size:17px;
+		color:#fff;
+		line-height:32px;
+		text-align:center;
+		margin-bottom:10px;
+	}
+	.fixed_item li a{ color:#fff;}	
+	.fixed_item li:hover{ background:#0093a6;}
+</style>
+<div class="fixed_item">
+	<ul>
+		#(itemhtml)
+	</ul>
+</div>
+<link href="#(ctx)/common/css/redis.css" rel="stylesheet">
+<div id="page-title">
+	<h1 class="page-header text-overflow">#(pageTitleBread.pageTitle)</h1>
+</div>
+<ol class="breadcrumb">
+	<li><a href="javascript:void(0);">首页</a></li>
+	<li><a href="javascript:void(0);" onclick="doPjax('#(ctx)#(pageTitleBread.url)?topicid=#(topicid)')">#(pageTitleBread.pageTitle)</a></li>
+	<li class="active">#(pageTitleBread.nowBread)</li>
+</ol>
+<div class="col-md-offset-2 col-md-8" style="text-align: center;width: 100%;margin-left: 0px;">
+    <h1>#(topic?topic.name:'')</h1>
+</div>
+<div class="col-md-offset-2 col-md-8" style="width: 100%;margin-left: 0px;">
+   <div class="panel panel-default">
+   		<div class="panel-body" style="padding: 18px;">
+			<div class="col-md-4">考核时间：#(topic?topic.begintime:'00:00') ~ #(topic?topic.endtime:'00:00')</div>
+		</div>
+   </div>
+</div>
+<div class="col-md-offset-2 col-md-8" style="width: 100%;margin-left: 0px;">
+    #(sjhtml)
+</div>
+<div class="col-md-offset-2 col-md-8" style="width: 100%;margin-left: 0px;">
+    <div class="panel panel-default space">
+        <div class="panel-heading">
+            <h3 class="panel-title">市州评分</h3>
+        </div>
+        <div id="qxForm" class="panel-body form-horizontal form-padding">
+			<input type="hidden" name="score.topicid" class="form-control" value="#(t?t.topicid:'')">
+			<input type="hidden" name="score.id" class="form-control" value="#(t?t.id:'')">
+			<input type="hidden" name="score.userid" class="form-control" value="#(t?t.userid:'')">
+			<input type="hidden" id="evaluate" class="form-control" value="#(t?t.evaluate:'')">
+	        <div class="panel-body">
+	        	<div class="evaluate_div">
+	        		<lable>市州对本次指标列表最终打分：</lable>
+	        		<div class="radio-check"><input type="radio" name="score.evaluate" id="evaluate1" value="优秀" disabled><label for="evaluate1">优秀</label></div>
+	        		<div class="radio-check"><input type="radio" name="score.evaluate" id="evaluate2" value="合格" disabled><label for="evaluate2">合格</label></div>
+	        		<div class="radio-check"><input type="radio" name="score.evaluate" id="evaluate3" value="不合格" disabled><label for="evaluate3">不合格</label></div>
+	        	</div>
+			    <div class="evaluate_div">
+			    	<lable>市州对本次录入人的评价：</lable>
+			    	<textarea class="form-control" rows="8" cols="5" style="width: 100%;margin-top: 5px;" name="score.describle" readonly="readonly">#(t?t.describle:'')</textarea>
+			    </div>
+	        </div>
+	     </div>
+    </div>
+    <div class="panel panel-default space">
+        <div class="panel-heading">
+            <h3 class="panel-title">专家评分</h3>
+        </div>
+        <div id="zjForm" class="panel-body form-horizontal form-padding" style="padding-bottom: 30px;">
+			<input type="hidden" name="score.topicid" class="form-control" value="#(t?t.topicid:'')">
+			<input type="hidden" name="score.id" class="form-control" value="#(t?t.id:'')">
+			<input type="hidden" name="score.userid" class="form-control" value="#(t?t.userid:'')">
+			<input type="hidden" id="zjpfbz" class="form-control" value="#(t?t.zjpfbz:'')">
+	        <div class="panel-body">
+	        	<div class="evaluate_div">
+	        		<lable>专家对本次指标列表最终打分：</lable>
+	        		<div class="radio-check"><input type="radio" name="score.zjpfbz" id="zjpfbz1" value="优秀" disabled><label for="zjpfbz1">优秀</label></div>
+	        		<div class="radio-check"><input type="radio" name="score.zjpfbz" id="zjpfbz2" value="合格" disabled><label for="zjpfbz2">合格</label></div>
+	        		<div class="radio-check"><input type="radio" name="score.zjpfbz" id="zjpfbz3" value="不合格" disabled><label for="zjpfbz3">不合格</label></div>
+	        	</div>
+			    <div class="evaluate_div">
+			    	<lable>专家对本次录入人的评价：</lable>
+			    	<textarea class="form-control" rows="8" cols="5" style="width: 100%;margin-top: 5px;" name="score.zjpfms" readonly="readonly">#(t?t.zjpfms:'')</textarea>
+			    </div>
+	        </div>
+	     </div>
+    </div>
+</div>
+<script type="text/javascript">
+	var arr=[];
+	for (var i = 0; i < #(total); i++) {
+		//arr[i]= UE.getEditor('content'+(i+1), {});
+		arr[i]= new UE.ui.Editor({readonly:true,})
+		arr[i].render('content'+(i+1));
+	}
+
+	var evaluate = $("#evaluate").val();
+	if(evaluate=="优秀"){
+		$("#qxForm").find("input[name='score.evaluate']:eq(0)").attr("checked",true);
+	}else if(evaluate=="合格"){
+		$("#qxForm").find("input[name='score.evaluate']:eq(1)").attr("checked",true);
+	}else if(evaluate=="不合格"){
+		$("#qxForm").find("input[name='score.evaluate']:eq(2)").attr("checked",true);
+	}
+	
+	var zjpfbz = $("#zjpfbz").val();
+	if(zjpfbz=="优秀"){
+		$("#zjForm").find("input[name='score.zjpfbz']:eq(0)").attr("checked",true);
+	}else if(zjpfbz=="合格"){
+		$("#editForm").find("input[name='score.zjpfbz']:eq(1)").attr("checked",true);
+	}else if(zjpfbz=="不合格"){
+		$("#editForm").find("input[name='score.zjpfbz']:eq(2)").attr("checked",true);
+	}
+</script>

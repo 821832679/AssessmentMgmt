@@ -1,0 +1,234 @@
+#include("/common/include/pageTitleBread.html")
+<div id="page-content">
+	<div class="col-sm-12 eq-box-sm">
+		<div class="panel lion-fullHeight">
+   			<div class="panel-body">
+   				<div style="text-align: center;">	     
+   					<input type="hidden" id="orgid"/> 
+					<input type="text" name="orgname" id="orgname"  placeholder="组织机构进行搜索" style="width: 150px;" readonly/> 
+					<span> 
+						<input type="button" value="选择组织机构" data-toggle="modal" data-target="#myModal" />
+					</span>
+		             <input type="text" name="Searcht" id="Searcht" value="" placeholder="请输入指标名称、录入人、评分人进行搜索" style="width: 300px;"/>
+		             <span> <input type="button" value="搜索" onclick="onclicked()"/> </span>
+		             <span> <input type="button" value="下载统计excel" onclick="ondownload()"/> </span>
+		             <span> <input type="button" value="全局统计" onclick="giveDownload()"/> </span>
+			     </div>
+   				<table id="pageTable" class="demo-add-niftycheck" data-toolbar="#del,#add"
+		               data-search="true"
+		               data-show-refresh="true"
+		               data-show-toggle="true"
+		               data-show-columns="true"
+		               data-sort-name="id"
+		               data-page-list="[5, 10, 20]"
+		               data-page-size="5"
+		               data-pagination="true" data-show-pagination-switch="true" data-toggle="table">
+		               <thead>
+			               <tr></tr>
+			               <tr></tr>
+			               <tr></tr>
+			               <tr></tr>
+			               <tr></tr>
+			               <tr></tr>
+		               </thead>
+		               <tbody>
+		               </tbody>
+		         </table>
+		    </div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">组织机构</h4>
+            </div>
+            <div class="modal-body">
+            	<ul id="treeDemo" class="ztree"></ul>
+			</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<script>
+	SearchValue='';
+	orgid='';
+	var col = [{
+		   field: 'checked',
+	       checkbox : true,
+	       align: 'center'
+	   },{
+		 field:'title',
+		 title: '任务指标',
+	     align: 'center'
+	   },{
+		 field:'username',
+		 title: '录入人',
+	     align: 'center',
+	     width:'80',
+	   },{
+		 field:'orgname',
+		 title: '机构名称',
+	     align: 'center',
+	   },{
+		 field:'createtime',
+		 title: '考核时间',
+	     align: 'center',
+	     width:'150',
+	   },{
+		 field:'qxbegintime',
+		 title: '区县评分时间',
+		 align: 'center',
+		 width:'180',
+		 formatter:function(value,row,index){
+			 return row.qxbegintime +"~"+row.qxendtime;
+		 }
+	   },{
+		 field:'zjbegintime',
+		 title: '专家评分时间',
+		 align: 'center',
+		 width:'180',
+		 formatter:function(value,row,index){
+			 return row.zjbegintime +"~"+row.zjendtime;
+		 }
+	   },{
+		 field:'person',
+		 title: '评分人',
+		 align: 'center'
+	   },{
+		 field:'marktime',
+		 title: '评分时间',
+	     align: 'center',
+	     width:'150',
+	   },{
+		 field:'evaluate',
+		 title: '最终评分',
+	     align: 'center',
+	     width:'80',
+	   },{
+		 field:'id',
+		 title: '操作',
+	     align: 'center',
+	     width:'150',
+	     formatter:function(value,row,index){
+	           //通过formatter可以自定义列显示的内容
+	           //value：当前field的值
+	           //row：当前行的数据
+	           var a = '<a class="label label-table label-success" onclick="doPjax(\''+ctx+'/admin/scoreadmin/getListByIDModel?userid='+row.userid+'&id='+row.id+'&topicid='+row.topicid+'\')" href="javascript:void(0);" >指标维护</a>';
+	           return a;
+	       } 
+	}]
+	var opt = {
+		       //是否显示行间隔色
+			   striped: true,
+			   //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）     
+			   cache: false,  
+			   //data-toolbar: "#demo-delete-row",
+			   //是否显示分页（*）  
+			   pagination: true,   
+			    //是否启用排序  
+			   sortable: false,    
+			    //排序方式 
+			   sortOrder: "asc",    
+			   //初始化加载第一页，默认第一页
+			   //我设置了这一项，但是貌似没起作用，而且我这默认是0,- -
+			   //pageNumber:1,   
+			   //每页的记录行数（*）   
+			   pageSize: 10,  
+			   //可供选择的每页的行数（*）    
+			   pageList: [10, 25, 50, 100],
+		       //这个接口需要处理bootstrap table传递的固定参数,并返回特定格式的json数据  
+			   url: ctx+"/admin/score/listData",
+				////查询参数,每次调用是会带上这个参数，可自定义                         
+			   queryParams : function(params) {
+			       return {
+			             pageNumber: ((params.offset+1)/params.limit)+1,
+			             pageSize: params.limit,
+			             SearchValue:SearchValue,
+			             orgid:orgid,
+			           };
+			   },
+			   //分页方式：client客户端分页，server服务端分页（*）
+			   sidePagination: "server",
+			   //是否显示搜索
+			   search: false,  
+			   //Enable the strict search.    
+			   strictSearch: true,
+			   //Indicate which field is an identity field.
+			   idField : "id",
+			   columns: col,
+			   pagination:true
+	};
+	
+	function initTable(){
+		$('#pageTable').bootstrapTable(opt);
+	}
+	function refreshTable(){
+		$("#pageTable").bootstrapTable('refresh', opt);
+	}
+	function onclicked(){
+		SearchValue = document.getElementById("Searcht").value;
+		orgid = document.getElementById("orgid").value;
+		opt.url = ctx+"/admin/score/listData";
+		refreshTable();
+	}
+	
+	function ondownload(){
+		var sValue = document.getElementById("Searcht").value;
+		var orgids = document.getElementById("orgid").value;
+		location.href = ctx+"/admin/scoreadmin/downloadExl?SearchValue="+sValue+"&orgid="+orgids;
+	}
+	
+	var setting = {
+		async : {
+			enable : true,
+			url : ctx + "/admin/login/getOrgTree"
+		},
+		callback : {
+			onClick : clickNode
+		}
+	};
+	
+	function clickNode(event, treeId, treeNode, clickFlag) {
+		$("#orgid").val(treeNode.id);
+		$("#orgname").val(treeNode.name);
+	}
+	
+	//统计下载
+	var giveUserRoleIframe;
+	function giveDownload() {
+		var url = ctx + '/admin/scoreadmin/downloadWeb';
+		var index = layer
+				.open({
+					type : 2,
+					title : false, //不显示标题栏
+					area : [ '650px', '350px' ],
+					shade : 0.8,
+					id : 'giveUserRole', //设定一个id，防止重复弹出
+					resize : false,
+					closeBtn : false,
+					isOutAnim : false,
+					btn : [ '关闭' ],
+					btnAlign : 'c',
+					content : url,
+					success : function(layero) {
+						giveUserRoleIframe = window[layero.find('iframe')[0]['name']];
+					},
+					yes : function() {
+						var editForm = giveUserRoleIframe.subsave();
+						layer.closeAll();
+					}
+				});
+	}
+
+	$(document).ready(function() {
+		initFullHeight();//初始化高度
+		initTable();//初始化表格
+		$.fn.zTree.init($("#treeDemo"), setting);//初始化树
+	});
+</script>

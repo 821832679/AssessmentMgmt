@@ -1,0 +1,63 @@
+一、软件
+1、nginx
+	/usr/local/nginx
+2、tomcat-7
+	/var/tomcat/tomcat-7
+3、jdk-1.7
+	/usr/lib/jvm/jre-1.7.0
+4、mysql
+	mysql配置文件为/etc/my.cnf，mysql的root采用随机密码，密码存储在/root/default.pass文件。
+
+二、默认站点
+	服务器已经为您建立了一个默认站点，默认站点支持jdk1.7，tomcat7。默认站点的ftp名为default，根目录为/home/default，defualt的ftp密码存储在/root/default.pass文件。
+	管理默认站点：
+	1、重启nginx
+	service nginx restart
+	2、重启默认站点的tomcat
+	service default restart
+	3、修改站点ftp的密码
+	passwd ftp用户名	//命令会提示两次输入密码
+	例如:
+	passwd default
+	4、默认站点访问路径
+	http://ip/
+
+三、新建站点示例
+1、配置ftp
+	创建用户，用户名为test，根目录为/home/test
+	useradd -g ftp -d /home/test -m -s /sbin/nologin test
+	chmod 755 /home/test
+	echo "test" >> /etc/vsftpd/chroot_list
+
+2、配置tomcat
+	示例采用tomcat7，jdk-1.7
+	cd /var/tomcat
+	cp tomcat-7 test -r
+	cd test
+	chown test:ftp conf logs temp work -R
+	配置tomcat监听端口
+		更改conf/server.xml文件，找到Connector节点，更改port的值。在本示例中采用9000端口，即port="9000"。端口必须唯一。不被其他程序使用
+	配置站点目录
+		更改conf/server.xml文件，找到Host节点，更改appBase的值，本示例中站点目录为/home/test，即appBase="/home/test"。
+	为了安全，以test用户启动tomcat
+		sudo -H -u test bash -c /var/tomcat/test/bin/startup.sh
+	关闭tomcat
+		sudo -H -u test bash -c /var/tomcat/test/bin/startup.sh
+
+3、配置nginx做反向代理
+	更改nginx配置文件/usr/local/nginx/conf/nginx.conf，添加一个server节点
+	server
+	{
+		listen       80 default_server;
+		server_name  localhost;
+
+		index index.jsp index.html;
+		root /home/default;
+		location ~ .* {
+			proxy_pass http://127.0.0.1:9000;
+			proxy_set_header X-Real-IP $remote_addr;
+		}
+	}
+	proxy_pass http://127.0.0.1:9000这一行的端口必须与前面tomcat的端口一致
+
+
